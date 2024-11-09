@@ -1,9 +1,11 @@
 
-SRC=main.cpp
+SRC=src/main.cpp src/psik.cpp
 INC=-Iinclude
 LDFLAGS=-lraylib -lbox2d
 
-mortal: $(SRC)
+INCS:= $(wildcard include/*.h)
+
+mortal: $(SRC) $(INCS)
 	clang++ $(INC) -o $@ $(SRC) $(LDFLAGS)
  
 
