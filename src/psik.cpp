@@ -6,7 +6,7 @@ Psik::Psik(b2WorldId worldId) {
     float weight = 64.0f;
 
     // torso
-    float torso_w = 0.20f;
+    float torso_w = 0.19f;
     float torso_h = 0.53f;
     torsoExtent = {torso_w * 0.5f, torso_h * 0.5f};
 
@@ -23,6 +23,7 @@ Psik::Psik(b2WorldId worldId) {
 
     b2ShapeDef torsoShapeDef = b2DefaultShapeDef();
     torsoShapeDef.density = (weight * 0.48f) / (torso_w * torso_h);
+    torsoShapeDef.filter.groupIndex = -Group::PLAYER;
     b2CreatePolygonShape(torsoId, &torsoShapeDef, &torso);
 
     // head
@@ -41,6 +42,7 @@ Psik::Psik(b2WorldId worldId) {
 
     b2ShapeDef headShapeDef = b2DefaultShapeDef();
     headShapeDef.density = (weight * 0.08f) / (head_w * head_h);
+    headShapeDef.filter.groupIndex = -Group::PLAYER;
     b2CreatePolygonShape(headId, &headShapeDef, &head);
 
     // thigh
@@ -58,7 +60,8 @@ Psik::Psik(b2WorldId worldId) {
     b2Polygon thigh = b2MakeBox(thighExtent.x, thighExtent.y);
 
     b2ShapeDef thighShapeDef = b2DefaultShapeDef();
-    thighShapeDef.density = (weight * 0.11f) / (thigh_w * thigh_h);
+    thighShapeDef.density = (weight * 0.22f) / (thigh_w * thigh_h);
+    thighShapeDef.filter.groupIndex = -Group::PLAYER;
     b2CreatePolygonShape(thighId, &thighShapeDef, &thigh);
 
     // shin
@@ -76,7 +79,8 @@ Psik::Psik(b2WorldId worldId) {
     b2Polygon shin = b2MakeBox(shinExtent.x, shinExtent.y);
 
     b2ShapeDef shinShapeDef = b2DefaultShapeDef();
-    shinShapeDef.density = (weight * 0.05f) / (shin_w * shin_h);
+    shinShapeDef.density = (weight * 0.10f) / (shin_w * shin_h);
+    shinShapeDef.filter.groupIndex = -Group::PLAYER;
     b2CreatePolygonShape(shinId, &shinShapeDef, &shin);
 
     // foot
@@ -94,9 +98,48 @@ Psik::Psik(b2WorldId worldId) {
     b2Polygon foot = b2MakeBox(footExtent.x, footExtent.y);
 
     b2ShapeDef footShapeDef = b2DefaultShapeDef();
-    footShapeDef.density = (weight * 0.016f) / (foot_w * foot_h);
+    footShapeDef.density = (weight * 0.035f) / (foot_w * foot_h);
     footShapeDef.friction = 1.0f;
+    footShapeDef.filter.groupIndex = -Group::PLAYER;
     b2CreatePolygonShape(footId, &footShapeDef, &foot);
+
+    // upper arm
+
+    float upperArm_w = 0.05f;
+    float upperArm_h = 0.35f;
+    upperArmExtent = {upperArm_w * 0.5f, upperArm_h * 0.5f};
+
+    b2BodyDef upperArmBodyDef = b2DefaultBodyDef();
+    upperArmBodyDef.type = b2_dynamicBody;
+    upperArmBodyDef.position.y = torsoBodyDef.position.y;
+
+    upperArmId = b2CreateBody(worldId, &upperArmBodyDef);
+
+    b2Polygon upperArm = b2MakeBox(upperArmExtent.x, upperArmExtent.y);
+
+    b2ShapeDef upperArmShapeDef = b2DefaultShapeDef();
+    upperArmShapeDef.density = (weight * 0.047f) / (upperArm_w * upperArm_h);
+    upperArmShapeDef.filter.groupIndex = -Group::PLAYER;
+    b2CreatePolygonShape(upperArmId, &upperArmShapeDef, &upperArm);
+
+    // lower arm
+
+    float lowerArm_w = 0.043f;
+    float lowerArm_h = 0.29f;
+    lowerArmExtent = {lowerArm_w * 0.5f, lowerArm_h * 0.5f};
+
+    b2BodyDef lowerArmBodyDef = b2DefaultBodyDef();
+    lowerArmBodyDef.type = b2_dynamicBody;
+    lowerArmBodyDef.position.y = torsoBodyDef.position.y;
+
+    lowerArmId = b2CreateBody(worldId, &lowerArmBodyDef);
+
+    b2Polygon lowerArm = b2MakeBox(lowerArmExtent.x, lowerArmExtent.y);
+
+    b2ShapeDef lowerArmShapeDef = b2DefaultShapeDef();
+    lowerArmShapeDef.density = (weight * 0.022f) / (lowerArm_w * lowerArm_h);
+    lowerArmShapeDef.filter.groupIndex = -Group::PLAYER;
+    b2CreatePolygonShape(lowerArmId, &lowerArmShapeDef, &lowerArm);
 
     // neck joint
     b2RevoluteJointDef neck_joint_def = b2DefaultRevoluteJointDef();
@@ -152,9 +195,38 @@ Psik::Psik(b2WorldId worldId) {
     ankle_joint_def.maxMotorTorque = 200.0f;
     ankle_joint_def.motorSpeed = 0.0f;
     ankle_joint_def.enableMotor = true;
-    ankle_joint_def.collideConnected = false;
 
     ankleJointId = b2CreateRevoluteJoint(worldId, &ankle_joint_def);
+
+    // shoulder joint
+    b2RevoluteJointDef shoulder_joint_def = b2DefaultRevoluteJointDef();
+    shoulder_joint_def.bodyIdA = torsoId;
+    shoulder_joint_def.bodyIdB = upperArmId;
+    shoulder_joint_def.localAnchorA = {0.0f, torsoExtent.y * 0.8f};
+    shoulder_joint_def.localAnchorB = {0.0f, upperArmExtent.y * 0.9f};
+    shoulder_joint_def.lowerAngle = SHOULDER_LOWER_ANGLE;
+    shoulder_joint_def.upperAngle = SHOULDER_UPPER_ANGLE;
+    shoulder_joint_def.enableLimit = true;
+    shoulder_joint_def.maxMotorTorque = 200.0f;
+    shoulder_joint_def.motorSpeed = 0.0f;
+    shoulder_joint_def.enableMotor = true;
+
+    shoulderJointId = b2CreateRevoluteJoint(worldId, &shoulder_joint_def);
+
+    // elbow joint
+    b2RevoluteJointDef elbow_joint_def = b2DefaultRevoluteJointDef();
+    elbow_joint_def.bodyIdA = upperArmId;
+    elbow_joint_def.bodyIdB = lowerArmId;
+    elbow_joint_def.localAnchorA = {0.0f, -upperArmExtent.y * 0.9f};
+    elbow_joint_def.localAnchorB = {0.0f, lowerArmExtent.y * 0.9f};
+    elbow_joint_def.lowerAngle = ELBOW_LOWER_ANGLE;
+    elbow_joint_def.upperAngle = ELBOW_UPPER_ANGLE;
+    elbow_joint_def.enableLimit = true;
+    elbow_joint_def.maxMotorTorque = 200.0f;
+    elbow_joint_def.motorSpeed = 0.0f;
+    elbow_joint_def.enableMotor = true;
+
+    elbowJointId = b2CreateRevoluteJoint(worldId, &elbow_joint_def);
 }
 
 void Psik::draw() {
@@ -198,6 +270,22 @@ void Psik::draw() {
 
     Rectangle foot_rec = {foot_p.x * PPM, -foot_p.y * PPM, footExtent.x * 2 * PPM, footExtent.y * 2 * PPM};
     DrawRectanglePro(foot_rec, {0.0f, 0.0f}, -foot_angle * RAD2DEG, DARKBLUE);
+
+    // upper arm
+    b2Vec2 upper_arm_p = b2Body_GetWorldPoint(upperArmId, {-upperArmExtent.x, upperArmExtent.y});
+    b2Rot upper_arm_rotation = b2Body_GetRotation(upperArmId);
+    float upper_arm_angle = b2Rot_GetAngle(upper_arm_rotation);
+
+    Rectangle upper_arm_rec = {upper_arm_p.x * PPM, -upper_arm_p.y * PPM, upperArmExtent.x * 2 * PPM, upperArmExtent.y * 2 * PPM};
+    DrawRectanglePro(upper_arm_rec, {0.0f, 0.0f}, -upper_arm_angle * RAD2DEG, BLUE);
+
+    // lower arm
+    b2Vec2 lower_arm_p = b2Body_GetWorldPoint(lowerArmId, {-lowerArmExtent.x, lowerArmExtent.y});
+    b2Rot lower_arm_rotation = b2Body_GetRotation(lowerArmId);
+    float lower_arm_angle = b2Rot_GetAngle(lower_arm_rotation);
+
+    Rectangle lower_arm_rec = {lower_arm_p.x * PPM, -lower_arm_p.y * PPM, lowerArmExtent.x * 2 * PPM, lowerArmExtent.y * 2 * PPM};
+    DrawRectanglePro(lower_arm_rec, {0.0f, 0.0f}, -lower_arm_angle * RAD2DEG, PURPLE);
 };
 
 void Psik::set_joint_angle(b2JointId jointId, float angle, float speed) {
@@ -217,4 +305,10 @@ void Psik::set_pose(Pose pose) {
 
     float ankle_target_angle = std::max(std::min(pose.ankle_angle, ANKLE_UPPER_ANGLE), ANKLE_LOWER_ANGLE);
     set_joint_angle(ankleJointId, ankle_target_angle, pose.ankle_force);
+
+    float shoulder_target_angle = std::max(std::min(pose.shoulder_angle, SHOULDER_UPPER_ANGLE), SHOULDER_LOWER_ANGLE);
+    set_joint_angle(shoulderJointId, shoulder_target_angle, pose.shoulder_force);
+
+    float elbow_target_angle = std::max(std::min(pose.elbow_angle, ELBOW_UPPER_ANGLE), ELBOW_LOWER_ANGLE);
+    set_joint_angle(elbowJointId, elbow_target_angle, pose.elbow_force);
 }

@@ -85,51 +85,10 @@ int main() {
     float zoom_speed = 1.0f;
 
     Pose poses[] = {
-        {
-            // standing
-            .hip_angle = 0.0f,
-            .hip_force = 10.0f,
-
-            .knee_angle = KNEE_LOWER_ANGLE * 0.0008f,
-            .knee_force = 10.0f,
-
-            .ankle_angle = ANKLE_UPPER_ANGLE * 0.0005f,
-            .ankle_force = 6.0f,
-        },
-        {
-            // prep
-            .hip_angle = HIP_UPPER_ANGLE * 0.8f,
-            .hip_force = 7.0f,
-
-            .knee_angle = KNEE_LOWER_ANGLE * 0.6f,
-            .knee_force = 10.0f,
-
-            .ankle_angle = ANKLE_UPPER_ANGLE,
-            .ankle_force = 10.0f,
-
-        },
-        {
-            // jump
-            .hip_angle = HIP_LOWER_ANGLE * 0.2f,
-            .hip_force = 100.0f,
-
-            .knee_angle = KNEE_UPPER_ANGLE,
-            .knee_force = 30.0f,
-
-            .ankle_angle = ANKLE_LOWER_ANGLE,
-            .ankle_force = 100.0f,
-        },
-        {
-            // tuck
-            .hip_angle = HIP_UPPER_ANGLE,
-            .hip_force = 50.0f,
-
-            .knee_angle = KNEE_LOWER_ANGLE * 0.9f,
-            .knee_force = 30.0f,
-
-            .ankle_angle = ANKLE_UPPER_ANGLE * 0.001f,
-            .ankle_force = 30.0f,
-        },
+        Poses::standing,
+        Poses::jump_prep,
+        Poses::jump,
+        Poses::tuck,
     };
 
     int pose_idx = 0;

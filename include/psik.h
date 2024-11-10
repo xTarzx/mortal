@@ -2,15 +2,6 @@
 #include <box2d/box2d.h>
 #include "pose.h"
 
-#define HIP_LOWER_ANGLE (-b2_pi * 0.25f)
-#define HIP_UPPER_ANGLE (b2_pi * 0.72f)
-
-#define KNEE_LOWER_ANGLE (-b2_pi * 0.6f)
-#define KNEE_UPPER_ANGLE 0.0f
-
-#define ANKLE_LOWER_ANGLE (-b2_pi * 0.15f)
-#define ANKLE_UPPER_ANGLE (b2_pi * 0.05f)
-
 class Psik {
    public:
     b2BodyId torsoId;
@@ -28,9 +19,17 @@ class Psik {
     b2BodyId footId;
     b2Vec2 footExtent;
 
+    b2BodyId upperArmId;
+    b2Vec2 upperArmExtent;
+
+    b2BodyId lowerArmId;
+    b2Vec2 lowerArmExtent;
+
     b2JointId hipJointId;
     b2JointId kneeJointId;
     b2JointId ankleJointId;
+    b2JointId shoulderJointId;
+    b2JointId elbowJointId;
 
     Psik(b2WorldId b2WorldId);
     void draw();
