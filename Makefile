@@ -1,5 +1,5 @@
 
-SRC=src/main.cpp src/psik.cpp
+SRC=src/main.cpp src/psik.cpp src/pose.cpp
 INC=-Iinclude
 LDFLAGS=-lraylib -lbox2d
 
@@ -9,6 +9,9 @@ mortal: $(SRC) $(INCS)
 	clang++ $(INC) -o $@ $(SRC) $(LDFLAGS)
  
 
-.PHONY: run
+.PHONY: run clean
 run: mortal
 	./mortal
+
+clean:
+	rm ./mortal

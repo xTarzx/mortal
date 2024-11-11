@@ -295,20 +295,3 @@ void Psik::set_joint_angle(b2JointId jointId, float angle, float speed) {
     b2Joint_WakeBodies(jointId);
     b2RevoluteJoint_SetMotorSpeed(jointId, speed * diff);
 };
-
-void Psik::set_pose(Pose pose) {
-    float hip_target_angle = std::max(std::min(pose.hip_angle, HIP_UPPER_ANGLE), HIP_LOWER_ANGLE);
-    set_joint_angle(hipJointId, hip_target_angle, pose.hip_force);
-
-    float knee_target_angle = std::max(std::min(pose.knee_angle, KNEE_UPPER_ANGLE), KNEE_LOWER_ANGLE);
-    set_joint_angle(kneeJointId, knee_target_angle, pose.knee_force);
-
-    float ankle_target_angle = std::max(std::min(pose.ankle_angle, ANKLE_UPPER_ANGLE), ANKLE_LOWER_ANGLE);
-    set_joint_angle(ankleJointId, ankle_target_angle, pose.ankle_force);
-
-    float shoulder_target_angle = std::max(std::min(pose.shoulder_angle, SHOULDER_UPPER_ANGLE), SHOULDER_LOWER_ANGLE);
-    set_joint_angle(shoulderJointId, shoulder_target_angle, pose.shoulder_force);
-
-    float elbow_target_angle = std::max(std::min(pose.elbow_angle, ELBOW_UPPER_ANGLE), ELBOW_LOWER_ANGLE);
-    set_joint_angle(elbowJointId, elbow_target_angle, pose.elbow_force);
-}

@@ -7,6 +7,7 @@
 
 #include "common.h"
 #include "psik.h"
+#include "pose.h"
 
 struct Ground {
     b2BodyId bodyId;
@@ -84,15 +85,15 @@ int main() {
     float camera_speed = 150.0f;
     float zoom_speed = 1.0f;
 
-    Pose poses[] = {
-        Poses::standing,
-        Poses::jump_prep,
-        Poses::jump,
-        Poses::tuck,
+    KF kfs[] = {
+        {.pose = Poses::standing, .frame_dur = 0},
+        {.pose = Poses::jump_prep, .frame_dur = 0},
+        {.pose = Poses::jump, .frame_dur = 0},
+        {.pose = Poses::tuck, .frame_dur = 0},
     };
 
-    int pose_idx = 0;
-    int pose_count = sizeof(poses) / sizeof(poses[0]);
+    int kfc = sizeof(kfs) / sizeof(kfs[0]);
+    Poser poser = Poser(&psik, kfs, kfc);
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
@@ -102,16 +103,16 @@ int main() {
         if (IsKeyPressed(KEY_R)) {
             b2DestroyWorld(worldId);
             worldId = b2CreateWorld(&worldDef);
-            pose_idx = 0;
+            poser.reset();
             ground = Ground(worldId);
             psik = Psik(worldId);
         }
 
         if (IsKeyPressed(KEY_SPACE)) {
-            pose_idx = (pose_idx + 1) % pose_count;
+            poser.next_kf();
         }
 
-        psik.set_pose(poses[pose_idx]);
+        poser.update();
 
         camera.zoom += zoom_dir * zoom_speed * dt;
         camera.target = Vector2Add(camera.target, Vector2Scale(cam_mov, dt * camera_speed));

@@ -1,6 +1,5 @@
 #pragma once
 #include <box2d/box2d.h>
-#include "pose.h"
 
 class Psik {
    public:
@@ -35,6 +34,4 @@ class Psik {
     void draw();
 
     void set_joint_angle(b2JointId jointId, float angle, float speed);
-
-    void set_pose(Pose pose);
 };

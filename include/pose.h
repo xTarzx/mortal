@@ -1,5 +1,6 @@
 #pragma once
 #include "common.h"
+#include "psik.h"
 
 class Pose {
    public:
@@ -85,3 +86,27 @@ const Pose tuck = {
 };
 
 }  // namespace Poses
+
+struct KF {
+    Pose pose;
+    int frame_dur;
+};
+
+class Poser {
+   public:
+    KF *kfs;
+    int kfc;
+    int kf;
+
+    Psik *target;
+    int frame;
+
+    Poser(Psik *target, KF *kfs, int kfc);
+    void update();
+
+    void apply_pose(Pose pose);
+
+    void next_kf();
+
+    void reset();
+};
