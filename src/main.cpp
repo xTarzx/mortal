@@ -8,6 +8,7 @@
 #include "common.h"
 #include "psik.h"
 #include "pose.h"
+#include "poses.h"
 
 struct Ground {
     b2BodyId bodyId;
@@ -86,10 +87,14 @@ int main() {
     float zoom_speed = 1.0f;
 
     KF kfs[] = {
-        {.pose = Poses::standing, .frame_dur = 0},
+        {.pose = Poses::standing, .frame_dur = 15},
+        {.pose = Poses::standing_rlx, .frame_dur = 0},
         {.pose = Poses::jump_prep, .frame_dur = 0},
+        {.pose = Poses::prep_swing, .frame_dur = 3},
+        {.pose = Poses::jump0, .frame_dur = 6},
         {.pose = Poses::jump, .frame_dur = 0},
         {.pose = Poses::tuck, .frame_dur = 0},
+        {.pose = Poses::land0, .frame_dur = 3},
     };
 
     int kfc = sizeof(kfs) / sizeof(kfs[0]);

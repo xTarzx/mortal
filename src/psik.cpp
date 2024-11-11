@@ -12,7 +12,7 @@ Psik::Psik(b2WorldId worldId) {
 
     b2BodyDef torsoBodyDef = b2DefaultBodyDef();
     torsoBodyDef.type = b2_dynamicBody;
-    torsoBodyDef.position = {0.0f, 2.78f};
+    torsoBodyDef.position = {0.0f, 2.6f};
 
     torsoId = b2CreateBody(worldId, &torsoBodyDef);
 
@@ -33,8 +33,8 @@ Psik::Psik(b2WorldId worldId) {
 
     b2BodyDef headBodyDef = b2DefaultBodyDef();
     headBodyDef.type = b2_dynamicBody;
-    headBodyDef.position.x = 0.1f;
-    headBodyDef.position.y = torsoBodyDef.position.y + head_h;
+    headBodyDef.position.x = 0.0f;
+    headBodyDef.position.y = torsoBodyDef.position.y + torsoExtent.y + headExtent.y;
 
     headId = b2CreateBody(worldId, &headBodyDef);
 
@@ -53,7 +53,7 @@ Psik::Psik(b2WorldId worldId) {
 
     b2BodyDef thighBodyDef = b2DefaultBodyDef();
     thighBodyDef.type = b2_dynamicBody;
-    thighBodyDef.position.y = torsoBodyDef.position.y - torso_h - thigh_h;
+    thighBodyDef.position.y = torsoBodyDef.position.y - torsoExtent.y - thighExtent.y;
 
     thighId = b2CreateBody(worldId, &thighBodyDef);
 
@@ -72,7 +72,7 @@ Psik::Psik(b2WorldId worldId) {
 
     b2BodyDef shinBodyDef = b2DefaultBodyDef();
     shinBodyDef.type = b2_dynamicBody;
-    shinBodyDef.position.y = thighBodyDef.position.y - shinExtent.y;
+    shinBodyDef.position.y = thighBodyDef.position.y - thighExtent.y - shinExtent.y;
 
     shinId = b2CreateBody(worldId, &shinBodyDef);
 
@@ -130,7 +130,7 @@ Psik::Psik(b2WorldId worldId) {
 
     b2BodyDef lowerArmBodyDef = b2DefaultBodyDef();
     lowerArmBodyDef.type = b2_dynamicBody;
-    lowerArmBodyDef.position.y = torsoBodyDef.position.y;
+    lowerArmBodyDef.position.y = upperArmBodyDef.position.y - upperArmExtent.y - lowerArmExtent.y;
 
     lowerArmId = b2CreateBody(worldId, &lowerArmBodyDef);
 
@@ -191,8 +191,8 @@ Psik::Psik(b2WorldId worldId) {
     ankle_joint_def.lowerAngle = ANKLE_LOWER_ANGLE;
     ankle_joint_def.upperAngle = ANKLE_UPPER_ANGLE;
     ankle_joint_def.enableLimit = true;
-    ankle_joint_def.dampingRatio = 1.0f;
-    ankle_joint_def.maxMotorTorque = 200.0f;
+
+    ankle_joint_def.maxMotorTorque = 250.0f;
     ankle_joint_def.motorSpeed = 0.0f;
     ankle_joint_def.enableMotor = true;
 
