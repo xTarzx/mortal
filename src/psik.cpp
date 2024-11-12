@@ -2,6 +2,8 @@
 #include "common.h"
 #include "psik.h"
 
+BodyPart::BodyPart() {};
+
 BodyPart::BodyPart(b2WorldId worldId, b2Vec2 position, b2Vec2 extent, float weight) {
     b2BodyDef bodyDef = b2DefaultBodyDef();
     bodyDef.type = b2_dynamicBody;
@@ -25,7 +27,7 @@ Psik::Psik(b2WorldId worldId) {
     b2Vec2 torso_ext = {torso_w * 0.5f, torso_h * 0.5f};
     b2Vec2 torso_pos = {0.0f, 2.6f};
 
-    torso = BodyPart(worldId, torso_pos, torso_ext, weight * 0.48f);
+    this->torso = BodyPart(worldId, torso_pos, torso_ext, weight * 0.48f);
 
     // head
     float head_w = 0.13f;
@@ -33,7 +35,7 @@ Psik::Psik(b2WorldId worldId) {
     b2Vec2 head_ext = {head_w * 0.5f, head_h * 0.5f};
     b2Vec2 head_pos = {0.0f, torso_pos.y + torso.extent.y + head_ext.y};
 
-    head = BodyPart(worldId, head_pos, head_ext, weight * 0.08f);
+    this->head = BodyPart(worldId, head_pos, head_ext, weight * 0.08f);
 
     // thigh
 
@@ -42,7 +44,7 @@ Psik::Psik(b2WorldId worldId) {
     b2Vec2 thigh_ext = {thigh_w * 0.5f, thigh_h * 0.5f};
     b2Vec2 thigh_pos = {0.0f, torso_pos.y - torso.extent.y - thigh_ext.y};
 
-    thigh = BodyPart(worldId, thigh_pos, thigh_ext, weight * 0.22f);
+    this->thigh = BodyPart(worldId, thigh_pos, thigh_ext, weight * 0.22f);
 
     // shin
 
@@ -51,7 +53,7 @@ Psik::Psik(b2WorldId worldId) {
     b2Vec2 shin_ext = {shin_w * 0.5f, shin_h * 0.5f};
     b2Vec2 shin_pos = {0.0f, thigh_pos.y - thigh.extent.y - shin_ext.y};
 
-    shin = BodyPart(worldId, shin_pos, shin_ext, weight * 0.10f);
+    this->shin = BodyPart(worldId, shin_pos, shin_ext, weight * 0.10f);
 
     // foot
 
@@ -60,7 +62,7 @@ Psik::Psik(b2WorldId worldId) {
     b2Vec2 foot_ext = {foot_w * 0.5f, foot_h * 0.5f};
     b2Vec2 foot_pos = {0.0f, shin_pos.y - shin.extent.y - foot_ext.y};
 
-    foot = BodyPart(worldId, foot_pos, foot_ext, weight * 0.035f);
+    this->foot = BodyPart(worldId, foot_pos, foot_ext, weight * 0.035f);
     // footShapeDef.friction = 1.0f;
 
     // upper arm
@@ -70,7 +72,7 @@ Psik::Psik(b2WorldId worldId) {
     b2Vec2 upper_arm_ext = {upperArm_w * 0.5f, upperArm_h * 0.5f};
     b2Vec2 upper_arm_pos = {0.0f, torso_pos.y};
 
-    upper_arm = BodyPart(worldId, upper_arm_pos, upper_arm_ext, weight * 0.047f);
+    this->upper_arm = BodyPart(worldId, upper_arm_pos, upper_arm_ext, weight * 0.047f);
 
     // lower arm
 
@@ -79,7 +81,7 @@ Psik::Psik(b2WorldId worldId) {
     b2Vec2 lower_arm_ext = {lowerArm_w * 0.5f, lowerArm_h * 0.5f};
     b2Vec2 lower_arm_pos = {0.0f, upper_arm_pos.y - upper_arm.extent.y - lower_arm_ext.y};
 
-    lower_arm = BodyPart(worldId, lower_arm_pos, lower_arm_ext, );
+    this->lower_arm = BodyPart(worldId, lower_arm_pos, lower_arm_ext, weight * 0.022f);
 
     // neck joint
     b2RevoluteJointDef neck_joint_def = b2DefaultRevoluteJointDef();

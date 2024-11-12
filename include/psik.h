@@ -6,6 +6,7 @@ class BodyPart {
     b2BodyId id;
     b2Vec2 extent;
 
+    BodyPart();
     BodyPart(b2WorldId worldId, b2Vec2 position, b2Vec2 extent, float weight);
 };
 
