@@ -5,20 +5,35 @@
 
 class Pose {
    public:
-    float hip_angle;
-    float hip_force;
+    float r_hip_angle;
+    float r_hip_force;
 
-    float knee_angle;
-    float knee_force;
+    float l_hip_angle;
+    float l_hip_force;
 
-    float ankle_angle;
-    float ankle_force;
+    float r_knee_angle;
+    float r_knee_force;
 
-    float shoulder_angle;
-    float shoulder_force;
+    float l_knee_angle;
+    float l_knee_force;
 
-    float elbow_angle;
-    float elbow_force;
+    float r_ankle_angle;
+    float r_ankle_force;
+
+    float l_ankle_angle;
+    float l_ankle_force;
+
+    float r_shoulder_angle;
+    float r_shoulder_force;
+
+    float l_shoulder_angle;
+    float l_shoulder_force;
+
+    float r_elbow_angle;
+    float r_elbow_force;
+
+    float l_elbow_angle;
+    float l_elbow_force;
 };
 
 struct KF {

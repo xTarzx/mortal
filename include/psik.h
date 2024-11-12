@@ -14,17 +14,30 @@ class Psik {
    public:
     BodyPart torso;
     BodyPart head;
-    BodyPart thigh;
-    BodyPart shin;
-    BodyPart foot;
-    BodyPart upper_arm;
-    BodyPart lower_arm;
+    BodyPart r_thigh;
+    BodyPart l_thigh;
+    BodyPart r_shin;
+    BodyPart l_shin;
+    BodyPart r_foot;
+    BodyPart l_foot;
+    BodyPart r_upper_arm;
+    BodyPart r_lower_arm;
+    BodyPart l_upper_arm;
+    BodyPart l_lower_arm;
 
-    b2JointId hipJointId;
-    b2JointId kneeJointId;
-    b2JointId ankleJointId;
-    b2JointId shoulderJointId;
-    b2JointId elbowJointId;
+    b2JointId r_hipJointId;
+    b2JointId l_hipJointId;
+
+    b2JointId r_kneeJointId;
+    b2JointId l_kneeJointId;
+    b2JointId r_ankleJointId;
+    b2JointId l_ankleJointId;
+
+    b2JointId r_shoulderJointId;
+    b2JointId r_elbowJointId;
+
+    b2JointId l_shoulderJointId;
+    b2JointId l_elbowJointId;
 
     Psik(b2WorldId b2WorldId);
     void draw();

@@ -33,18 +33,33 @@ void Poser::update() {
 }
 
 void Poser::apply_pose(Pose pose) {
-    float hip_target_angle = std::max(std::min(pose.hip_angle, HIP_UPPER_ANGLE), HIP_LOWER_ANGLE);
-    target->set_joint_angle(target->hipJointId, hip_target_angle, pose.hip_force);
+    float r_hip_target_angle = std::max(std::min(pose.r_hip_angle, HIP_UPPER_ANGLE), HIP_LOWER_ANGLE);
+    target->set_joint_angle(target->r_hipJointId, r_hip_target_angle, pose.r_hip_force);
 
-    float knee_target_angle = std::max(std::min(pose.knee_angle, KNEE_UPPER_ANGLE), KNEE_LOWER_ANGLE);
-    target->set_joint_angle(target->kneeJointId, knee_target_angle, pose.knee_force);
+    float l_hip_target_angle = std::max(std::min(pose.l_hip_angle, HIP_UPPER_ANGLE), HIP_LOWER_ANGLE);
+    target->set_joint_angle(target->l_hipJointId, l_hip_target_angle, pose.l_hip_force);
 
-    float ankle_target_angle = std::max(std::min(pose.ankle_angle, ANKLE_UPPER_ANGLE), ANKLE_LOWER_ANGLE);
-    target->set_joint_angle(target->ankleJointId, ankle_target_angle, pose.ankle_force);
+    float r_knee_target_angle = std::max(std::min(pose.r_knee_angle, KNEE_UPPER_ANGLE), KNEE_LOWER_ANGLE);
+    target->set_joint_angle(target->r_kneeJointId, r_knee_target_angle, pose.r_knee_force);
 
-    float shoulder_target_angle = std::max(std::min(pose.shoulder_angle, SHOULDER_UPPER_ANGLE), SHOULDER_LOWER_ANGLE);
-    target->set_joint_angle(target->shoulderJointId, shoulder_target_angle, pose.shoulder_force);
+    float l_knee_target_angle = std::max(std::min(pose.l_knee_angle, KNEE_UPPER_ANGLE), KNEE_LOWER_ANGLE);
+    target->set_joint_angle(target->l_kneeJointId, l_knee_target_angle, pose.l_knee_force);
 
-    float elbow_target_angle = std::max(std::min(pose.elbow_angle, ELBOW_UPPER_ANGLE), ELBOW_LOWER_ANGLE);
-    target->set_joint_angle(target->elbowJointId, elbow_target_angle, pose.elbow_force);
+    float r_ankle_target_angle = std::max(std::min(pose.r_ankle_angle, ANKLE_UPPER_ANGLE), ANKLE_LOWER_ANGLE);
+    target->set_joint_angle(target->r_ankleJointId, r_ankle_target_angle, pose.r_ankle_force);
+
+    float l_ankle_target_angle = std::max(std::min(pose.l_ankle_angle, ANKLE_UPPER_ANGLE), ANKLE_LOWER_ANGLE);
+    target->set_joint_angle(target->l_ankleJointId, l_ankle_target_angle, pose.l_ankle_force);
+
+    float r_shoulder_target_angle = std::max(std::min(pose.r_shoulder_angle, SHOULDER_UPPER_ANGLE), SHOULDER_LOWER_ANGLE);
+    target->set_joint_angle(target->r_shoulderJointId, r_shoulder_target_angle, pose.r_shoulder_force);
+
+    float l_shoulder_target_angle = std::max(std::min(pose.l_shoulder_angle, SHOULDER_UPPER_ANGLE), SHOULDER_LOWER_ANGLE);
+    target->set_joint_angle(target->l_shoulderJointId, l_shoulder_target_angle, pose.l_shoulder_force);
+
+    float r_elbow_target_angle = std::max(std::min(pose.r_elbow_angle, ELBOW_UPPER_ANGLE), ELBOW_LOWER_ANGLE);
+    target->set_joint_angle(target->r_elbowJointId, r_elbow_target_angle, pose.r_elbow_force);
+
+    float l_elbow_target_angle = std::max(std::min(pose.l_elbow_angle, ELBOW_UPPER_ANGLE), ELBOW_LOWER_ANGLE);
+    target->set_joint_angle(target->l_elbowJointId, l_elbow_target_angle, pose.l_elbow_force);
 }
