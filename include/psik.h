@@ -11,26 +11,13 @@ class BodyPart {
 
 class Psik {
    public:
-    b2BodyId torsoId;
-    b2Vec2 torsoExtent;
-
-    b2BodyId headId;
-    b2Vec2 headExtent;
-
-    b2BodyId thighId;
-    b2Vec2 thighExtent;
-
-    b2BodyId shinId;
-    b2Vec2 shinExtent;
-
-    b2BodyId footId;
-    b2Vec2 footExtent;
-
-    b2BodyId upperArmId;
-    b2Vec2 upperArmExtent;
-
-    b2BodyId lowerArmId;
-    b2Vec2 lowerArmExtent;
+    BodyPart torso;
+    BodyPart head;
+    BodyPart thigh;
+    BodyPart shin;
+    BodyPart foot;
+    BodyPart upper_arm;
+    BodyPart lower_arm;
 
     b2JointId hipJointId;
     b2JointId kneeJointId;
