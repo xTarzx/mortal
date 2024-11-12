@@ -86,7 +86,7 @@ int main() {
     float camera_speed = 150.0f;
     float zoom_speed = 1.0f;
 
-    KF kfs[] = {
+    std::vector<KF> kfs1 = {
         {.pose = Poses::standing, .frame_dur = 15},
         {.pose = Poses::standing_rlx, .frame_dur = 0},
         {.pose = Poses::jump_prep, .frame_dur = 0},
@@ -94,11 +94,34 @@ int main() {
         {.pose = Poses::jump0, .frame_dur = 6},
         {.pose = Poses::jump, .frame_dur = 0},
         {.pose = Poses::tuck, .frame_dur = 0},
-        {.pose = Poses::land0, .frame_dur = 3},
+        {.pose = Poses::land0, .frame_dur = 6},
+        {.pose = Poses::land, .frame_dur = 0},
+    };
+    std::vector<KF> kfs2 = {
+        {.pose = Poses::standing, .frame_dur = 15},
+        {.pose = Poses::standing_rlx, .frame_dur = 0},
+        {.pose = Poses::jump_prep, .frame_dur = 0},
+        {.pose = Poses::prep_swing, .frame_dur = 3},
+        {.pose = Poses::jump0, .frame_dur = 6},
+        {.pose = Poses::jump, .frame_dur = 0},
+        {.pose = Poses::pike, .frame_dur = 0},
+        {.pose = Poses::land0, .frame_dur = 6},
+        {.pose = Poses::land, .frame_dur = 0},
     };
 
-    int kfc = sizeof(kfs) / sizeof(kfs[0]);
-    Poser poser = Poser(&psik, kfs, kfc);
+    std::vector<KF> kfs3 = {
+        {.pose = Poses::standing, .frame_dur = 15},
+        {.pose = Poses::standing_rlx, .frame_dur = 0},
+        {.pose = Poses::jump_prep, .frame_dur = 0},
+        {.pose = Poses::prep_swing, .frame_dur = 3},
+        {.pose = Poses::jump0, .frame_dur = 6},
+        {.pose = Poses::jump, .frame_dur = 0},
+    };
+
+    int k = 0;
+    std::vector<KF> kfs[] = {
+        kfs1, kfs2, kfs3};
+    Poser poser = Poser(&psik, kfs[k]);
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
@@ -111,6 +134,11 @@ int main() {
             poser.reset();
             ground = Ground(worldId);
             psik = Psik(worldId);
+        }
+
+        if (IsKeyPressed(KEY_V)) {
+            k = (k + 1) % (sizeof(kfs) / sizeof(kfs[0]));
+            poser.kfs = kfs[k];
         }
 
         if (IsKeyPressed(KEY_SPACE)) {
@@ -135,6 +163,8 @@ int main() {
         psik.draw();
 
         EndMode2D();
+
+        DrawText(TextFormat("mode: %d", k), 10, GetRenderHeight() - 32 - 10, 32, WHITE);
 
         EndDrawing();
     }

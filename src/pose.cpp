@@ -1,12 +1,9 @@
 #include "pose.h"
 #include <cassert>
 
-Poser::Poser(Psik* target, KF* kfs, int kfc) {
+Poser::Poser(Psik* target, std::vector<KF> kfs) {
     this->target = target;
     this->kfs = kfs;
-    this->kfc = kfc;
-
-    assert(kfc > 0 && "where chicken?");
 
     frame = 0;
     kf = 0;
@@ -19,7 +16,7 @@ void Poser::reset() {
 
 void Poser::next_kf() {
     kf++;
-    kf %= kfc;
+    kf %= kfs.size();
     frame = 0;
 }
 

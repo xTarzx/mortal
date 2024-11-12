@@ -136,6 +136,23 @@ const Pose tuck = {
     .elbow_force = 6.0f,
 };
 
+const Pose pike = {
+    .hip_angle = HIP_UPPER_ANGLE,
+    .hip_force = 15.0f,
+
+    .knee_angle = KNEE_UPPER_ANGLE * 0.85f,
+    .knee_force = 8.0f,
+
+    .ankle_angle = ANKLE_UPPER_ANGLE,
+    .ankle_force = 7.0f,
+
+    .shoulder_angle = SHOULDER_LOWER_ANGLE * 0.15f,
+    .shoulder_force = 12.0f,
+
+    .elbow_angle = ELBOW_UPPER_ANGLE * 0.55f,
+    .elbow_force = 6.0f,
+};
+
 const Pose land0 = {
     .hip_angle = 0.0f,
     .hip_force = 0.0f,
@@ -151,6 +168,23 @@ const Pose land0 = {
 
     .elbow_angle = ELBOW_LOWER_ANGLE * 0.98f,
     .elbow_force = 4.0f,
+};
+
+const Pose land = {
+    .hip_angle = HIP_UPPER_ANGLE * 0.05f,
+    .hip_force = 10.0f,
+
+    .knee_angle = KNEE_LOWER_ANGLE * 0.09f,
+    .knee_force = 10.0f,
+
+    .ankle_angle = ANKLE_UPPER_ANGLE * 0.05f,
+    .ankle_force = 5.0f,
+
+    .shoulder_angle = SHOULDER_UPPER_ANGLE * 0.5f,
+    .shoulder_force = 10.0f,
+
+    .elbow_angle = SHOULDER_UPPER_ANGLE * 0.08f,
+    .elbow_force = 10.0f,
 };
 
 }  // namespace Poses

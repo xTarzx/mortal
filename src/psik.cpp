@@ -2,6 +2,20 @@
 #include "common.h"
 #include "psik.h"
 
+BodyPart::BodyPart(b2WorldId worldId, b2Vec2 position, b2Vec2 extent, float weight) {
+    b2BodyDef bodyDef = b2DefaultBodyDef();
+    bodyDef.type = b2_dynamicBody;
+    bodyDef.position = position;
+    this->id = b2CreateBody(worldId, &bodyDef);
+    this->extent = extent;
+    b2Polygon poly = b2MakeBox(extent.x, extent.y);
+
+    b2ShapeDef shapeDef = b2DefaultShapeDef();
+    shapeDef.density = weight / ((this->extent.x * 2) * (this->extent.y * 2));
+    shapeDef.filter.groupIndex = -Group::PLAYER;
+    b2CreatePolygonShape(this->id, &shapeDef, &poly);
+}
+
 Psik::Psik(b2WorldId worldId) {
     float weight = 64.0f;
 

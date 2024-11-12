@@ -1,6 +1,7 @@
 #pragma once
 #include "common.h"
 #include "psik.h"
+#include <vector>
 
 class Pose {
    public:
@@ -27,14 +28,13 @@ struct KF {
 
 class Poser {
    public:
-    KF *kfs;
-    int kfc;
+    std::vector<KF> kfs;
     int kf;
 
     Psik *target;
     int frame;
 
-    Poser(Psik *target, KF *kfs, int kfc);
+    Poser(Psik *target, std::vector<KF> kfs);
     void update();
 
     void apply_pose(Pose pose);

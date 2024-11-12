@@ -1,6 +1,14 @@
 #pragma once
 #include <box2d/box2d.h>
 
+class BodyPart {
+   public:
+    b2BodyId id;
+    b2Vec2 extent;
+
+    BodyPart(b2WorldId worldId, b2Vec2 position, b2Vec2 extent, float weight);
+};
+
 class Psik {
    public:
     b2BodyId torsoId;
