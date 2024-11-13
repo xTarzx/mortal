@@ -75,9 +75,8 @@ int main() {
     int subStepCount = 4;
 
     Camera2D camera{
-        .offset = {GetRenderWidth() / 2.0f, GetRenderHeight() / 2.0f + 6.8f * PPM},
-        // .offset = {GetRenderWidth() / 2.0f, GetRenderHeight() / 2.0f},
-        .target = {0.0f, 0.0f},
+        .offset = {GetRenderWidth() / 2.0f, GetRenderHeight() / 2.0f},
+        .target = {0.0f, -2.6f * PPM},
         .rotation = 0.0f,
         .zoom = 2.62f,
 
@@ -87,7 +86,7 @@ int main() {
     float zoom_speed = 1.0f;
 
     std::vector<KF> kfs1 = {
-        {.pose = Poses::standing, .frame_dur = 15},
+        {.pose = Poses::standing, .frame_dur = 8},
         {.pose = Poses::standing_rlx, .frame_dur = 0},
         {.pose = Poses::jump_prep, .frame_dur = 0},
         {.pose = Poses::prep_swing, .frame_dur = 3},
@@ -95,7 +94,7 @@ int main() {
         {.pose = Poses::jump, .frame_dur = 0},
         {.pose = Poses::tuck, .frame_dur = 0},
         {.pose = Poses::land0, .frame_dur = 6},
-        {.pose = Poses::land, .frame_dur = 0},
+        {.pose = Poses::land, .frame_dur = 4},
     };
     std::vector<KF> kfs2 = {
         {.pose = Poses::standing, .frame_dur = 15},
@@ -127,6 +126,7 @@ int main() {
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
+
         Vector2 cam_mov = {(float)IsKeyDown(KEY_D) - (float)IsKeyDown(KEY_A), (float)IsKeyDown(KEY_S) - (float)IsKeyDown(KEY_W)};
         int zoom_dir = IsKeyDown(KEY_E) - IsKeyDown(KEY_Q);
 
@@ -150,6 +150,7 @@ int main() {
         poser.update();
 
         camera.zoom += zoom_dir * zoom_speed * dt;
+        camera.offset = {GetRenderWidth() / 2.0f, GetRenderHeight() / 2.0f};
         camera.target = Vector2Add(camera.target, Vector2Scale(cam_mov, dt * camera_speed));
 
         b2World_Step(worldId, timeStep, subStepCount);
@@ -171,7 +172,7 @@ int main() {
         EndDrawing();
     }
 
-    CloseWindow();
     b2DestroyWorld(worldId);
+    CloseWindow();
     return 0;
 }
