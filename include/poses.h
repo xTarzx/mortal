@@ -350,4 +350,34 @@ const Pose land = {
     .l_elbow_force = 10.0f,
 };
 
+const Pose split = {
+    .r_hip_angle = HIP_UPPER_ANGLE,
+    .r_hip_force = 15.0f,
+    .l_hip_angle = HIP_LOWER_ANGLE * 0.7f,
+    .l_hip_force = 15.0f,
+
+    .r_knee_angle = KNEE_UPPER_ANGLE * 0.85f,
+    .r_knee_force = 8.0f,
+
+    .l_knee_angle = KNEE_UPPER_ANGLE * 0.85f,
+    .l_knee_force = 0.0f,
+
+    .r_ankle_angle = ANKLE_UPPER_ANGLE,
+    .r_ankle_force = 7.0f,
+    .l_ankle_angle = ANKLE_UPPER_ANGLE,
+    .l_ankle_force = 7.0f,
+
+    .r_shoulder_angle = SHOULDER_LOWER_ANGLE * 0.15f,
+    .r_shoulder_force = 12.0f,
+
+    .l_shoulder_angle = SHOULDER_LOWER_ANGLE * 0.15f,
+    .l_shoulder_force = 12.0f,
+
+    .r_elbow_angle = ELBOW_UPPER_ANGLE * 0.55f,
+    .r_elbow_force = 6.0f,
+
+    .l_elbow_angle = ELBOW_UPPER_ANGLE * 0.55f,
+    .l_elbow_force = 6.0f,
+};
+
 }  // namespace Poses

@@ -2,6 +2,4 @@
 
 # TODO:
 
-- split legs and arms
-
-- cleanup
+-   todo

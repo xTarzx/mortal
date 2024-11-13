@@ -109,25 +109,20 @@ int main() {
         {.pose = Poses::land, .frame_dur = 0},
     };
 
-    std::vector<KF> kfs3 = {
+    std::vector<KF> vk = {
         {.pose = Poses::standing, .frame_dur = 15},
         {.pose = Poses::standing_rlx, .frame_dur = 0},
         {.pose = Poses::jump_prep, .frame_dur = 0},
         {.pose = Poses::prep_swing, .frame_dur = 3},
         {.pose = Poses::jump0, .frame_dur = 6},
         {.pose = Poses::jump, .frame_dur = 0},
-    };
-
-    std::vector<KF> kfs4 = {
-        {.pose = Poses::standing, .frame_dur = 15},
-        {.pose = Poses::standing_rlx, .frame_dur = 0},
-        {.pose = Poses::standing_rlx_arms, .frame_dur = 0},
+        {.pose = Poses::split, .frame_dur = 0},
 
     };
 
     int k = 0;
     std::vector<KF> kfs[] = {
-        kfs1, kfs2, kfs3, kfs4};
+        kfs1, kfs2, vk};
     Poser poser = Poser(&psik, kfs[k]);
 
     while (!WindowShouldClose()) {
