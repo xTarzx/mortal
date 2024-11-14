@@ -90,17 +90,17 @@ int main() {
     float camera_speed = 150.0f;
     float zoom_speed = 1.0f;
 
-    // std::vector<KF> kfs1 = {
-    //     {.pose = Poses::standing, .frame_dur = 8},
-    //     {.pose = Poses::standing_rlx, .frame_dur = 0},
-    //     {.pose = Poses::jump_prep, .frame_dur = 0},
-    //     {.pose = Poses::prep_swing, .frame_dur = 3},
-    //     {.pose = Poses::jump0, .frame_dur = 6},
-    //     {.pose = Poses::jump, .frame_dur = 0},
-    //     {.pose = Poses::tuck, .frame_dur = 0},
-    //     {.pose = Poses::land0, .frame_dur = 6},
-    //     {.pose = Poses::land, .frame_dur = 4},
-    // };
+    std::vector<KF> kfs1 = {
+        {.pose = Poses::standing, .frame_dur = 8},
+        {.pose = Poses::standing_rlx, .frame_dur = 0},
+        {.pose = Poses::jump_prep, .frame_dur = 0},
+        {.pose = Poses::prep_swing, .frame_dur = 3},
+        {.pose = Poses::jump0, .frame_dur = 6},
+        {.pose = Poses::jump, .frame_dur = 0},
+        {.pose = Poses::tuck, .frame_dur = 0},
+        {.pose = Poses::land0, .frame_dur = 6},
+        {.pose = Poses::land, .frame_dur = 4},
+    };
     // std::vector<KF> kfs2 = {
     //     {.pose = Poses::standing, .frame_dur = 15},
     //     {.pose = Poses::standing_rlx, .frame_dur = 0},
@@ -124,12 +124,9 @@ int main() {
 
     // };
 
-    std::vector<KF> edit_kfs = {
-        // {.pose = Poses::zero, .frame_dur = 32},
-        // {.pose = Poses::standing_rlx_arms, .frame_dur = 0},
-    };
+    std::vector<KF> edit_kfs = {};
 
-    Poser poser = Poser(&psik, edit_kfs);
+    Poser poser = Poser(&psik, kfs1);
     poser.play = false;
 
     float ed_frame_dur = 0.0f;
@@ -148,7 +145,8 @@ int main() {
             worldId = b2CreateWorld(&worldDef);
             int kf = poser.kf;
             poser.reset();
-            poser.kf = kf;
+            if (!poser.play)
+                poser.kf = kf;
             ground = Ground(worldId);
             psik = Psik(worldId);
         }
@@ -271,8 +269,8 @@ int main() {
 
             {  // left
 
-                float slider_width = screen_width * 0.08f;
-                float slider_height = screen_height * 0.03f;
+                float slider_width = screen_width * 0.12f;
+                float slider_height = screen_height * 0.04f;
 
                 float ed_x = 0.0f;
                 float ed_y = screen_height * 0.25f;
@@ -324,8 +322,8 @@ int main() {
 
             {  // right
 
-                float slider_width = screen_width * 0.08f;
-                float slider_height = screen_height * 0.03f;
+                float slider_width = screen_width * 0.12f;
+                float slider_height = screen_height * 0.04f;
 
                 float ed_x = screen_width - slider_width;
                 float ed_y = screen_height * 0.25f;

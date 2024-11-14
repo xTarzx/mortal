@@ -6,4 +6,11 @@
 
 # TODO:
 
-- pose editor
+-   import/export:
+
+    -   file dialog
+    -   error handling
+
+-   dev:
+    -   add raylib and box2d as submodules
+    -   cmake (?)
