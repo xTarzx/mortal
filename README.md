@@ -6,4 +6,4 @@
 
 # TODO:
 
--   todo
+- pose editor
