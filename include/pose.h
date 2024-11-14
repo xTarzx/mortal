@@ -49,6 +49,8 @@ class Poser {
     Psik *target;
     int frame;
 
+    bool play;
+
     Poser(Psik *target, std::vector<KF> kfs);
     void update();
 

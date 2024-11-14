@@ -7,6 +7,8 @@ Poser::Poser(Psik* target, std::vector<KF> kfs) {
 
     frame = 0;
     kf = 0;
+
+    play = true;
 };
 
 void Poser::reset() {
@@ -15,13 +17,17 @@ void Poser::reset() {
 }
 
 void Poser::next_kf() {
+    if (kfs.size() == 0) return;
     kf++;
     kf %= kfs.size();
     frame = 0;
 }
 
 void Poser::update() {
+    if (kfs.size() == 0) return;
     apply_pose(kfs[kf].pose);
+
+    if (!play) return;
 
     int frame_dur = kfs[kf].frame_dur;
 

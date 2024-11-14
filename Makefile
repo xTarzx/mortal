@@ -1,5 +1,5 @@
 
-SRC=src/main.cpp src/psik.cpp src/pose.cpp
+SRC=src/main.cpp src/psik.cpp src/pose.cpp src/serialize.cpp
 INC=-Iinclude
 LDFLAGS=-lraylib -lbox2d
 
