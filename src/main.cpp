@@ -21,7 +21,26 @@ void export_animation(std::vector<KF> kfs) {
         j.push_back(serialize_keyframe(kfs[i]));
     }
 
-    std::cout << j << std::endl;
+    const char* filepath = TextFormat("mortal.json");
+    std::string j_str = j.dump(4);
+
+    SaveFileText(filepath, const_cast<char*>(j_str.c_str()));
+}
+
+std::vector<KF> import_animation(const char* filepath) {
+    char* j_str = LoadFileText(filepath);
+
+    json j = json::parse(j_str);
+
+    std::vector<KF> kfs;
+
+    for (int i = 0; i < j.size(); i++) {
+        KF kf = deserialize_keyframe(j[i]);
+
+        kfs.push_back(kf);
+    }
+
+    return kfs;
 }
 
 struct Ground {
@@ -392,6 +411,9 @@ int main() {
             DrawText("import", rec.x + rec.width / 2 - msr.x / 2, rec.y + rec.height / 2 - msr.y / 2, font_sz, WHITE);
 
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, rec)) {
+                std::vector<KF> new_anim = import_animation("mortal.json");
+                poser.reset();
+                poser.kfs = new_anim;
             }
         }
 
