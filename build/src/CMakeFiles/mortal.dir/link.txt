@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG -Wl,--dependency-file,CMakeFiles/mortal.dir/link.d CMakeFiles/mortal.dir/main.cpp.o CMakeFiles/mortal.dir/pose.cpp.o CMakeFiles/mortal.dir/psik.cpp.o CMakeFiles/mortal.dir/serialize.cpp.o -o ../bin/mortal  ../external/raylib/raylib/libraylib.a -lbox2d -lm -lpthread /usr/lib/libOpenGL.so /usr/lib/libGLX.so /usr/lib/libGLU.so /usr/lib/librt.a -lm -ldl
