@@ -382,7 +382,11 @@ int main() {
 
                 Rectangle frame_dur_rec = {ed_x, ed_y, slider_width, slider_height};
                 GuiSlider(frame_dur_rec, "", TextFormat("frame duration"), &ed_frame_dur, 0.0f, 100.0f);
-                poser.kfs[poser.kf].frame_dur = std::round(ed_frame_dur);
+                int ed_dur = std::round(ed_frame_dur);
+                if (ed_dur != poser.kfs[poser.kf].frame_dur) {
+                    poser.play = false;
+                    poser.kfs[poser.kf].frame_dur = ed_dur;
+                }
             }  // frame dur
 
         }  // pose editor
