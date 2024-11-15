@@ -176,7 +176,6 @@ int main() {
         BeginMode2D(camera);
 
         ground.draw();
-        // box.draw();
 
         psik.draw();
 
