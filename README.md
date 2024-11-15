@@ -11,6 +11,11 @@
     -   file dialog
     -   error handling
 
+-   editor:
+    - copy/paste
+    - insert
+    - move KF
+
 -   dev:
     -   add raylib and box2d as submodules
     -   cmake (?)
