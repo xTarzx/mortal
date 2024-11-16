@@ -40,6 +40,7 @@ std::vector<KF> import_animation(const char* filepath) {
         kfs.push_back(kf);
     }
 
+    free(j_str);
     return kfs;
 }
 
