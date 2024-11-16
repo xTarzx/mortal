@@ -168,7 +168,11 @@ int main() {
         }
 
         if (IsKeyPressed(KEY_SPACE)) {
-            poser.next_kf();
+            if (IsKeyDown(KEY_LEFT_SHIFT)) {
+                poser.prev_kf();
+            } else {
+                poser.next_kf();
+            }
         }
 
         poser.update();

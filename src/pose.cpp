@@ -23,6 +23,15 @@ void Poser::next_kf() {
     frame = 0;
 }
 
+void Poser::prev_kf() {
+    if (kfs.size() == 0) return;
+    kf--;
+    if (kf < 0) {
+        kf = kfs.size() - 1;
+    }
+    frame = 0;
+}
+
 void Poser::update() {
     if (kfs.size() == 0) return;
     apply_pose(kfs[kf].pose);

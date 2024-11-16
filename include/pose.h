@@ -57,6 +57,7 @@ class Poser {
     void apply_pose(Pose pose);
 
     void next_kf();
+    void prev_kf();
 
     void reset();
 };
