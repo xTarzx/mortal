@@ -15,6 +15,11 @@
 
 #include "serialize.h"
 
+enum Error {
+    ERROR_FILE_NOT_EXIST,
+    ERROR_INVALID_FILE,
+};
+
 void export_animation(std::vector<KF> kfs) {
     json j = json::array();
     for (int i = 0; i < kfs.size(); i++) {
@@ -30,7 +35,13 @@ void export_animation(std::vector<KF> kfs) {
 std::vector<KF> import_animation(const char* filepath) {
     char* j_str = LoadFileText(filepath);
 
-    json j = json::parse(j_str);
+    if (j_str == nullptr) throw ERROR_FILE_NOT_EXIST;
+    json j;
+    try {
+        j = json::parse(j_str);
+    } catch (nlohmann::json_abi_v3_11_3::detail::parse_error err) {
+        throw ERROR_INVALID_FILE;
+    };
 
     std::vector<KF> kfs;
 
@@ -136,6 +147,7 @@ int main() {
     char ed_kf_name_text[KF_NAME_MAX_LEN] = {0};
     bool editing_name = false;
     int ed_kf_name_idx = 0;
+    char* error_str = nullptr;
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
@@ -146,11 +158,26 @@ int main() {
         if (!editing_name) {
             if (IsFileDropped()) {
                 FilePathList files = LoadDroppedFiles();
-                std::vector<KF> new_anim = import_animation(files.paths[0]);
-                UnloadDroppedFiles(files);
+                try {
+                    std::vector<KF> new_anim = import_animation("mortal.json");
+                    poser.reset();
+                    poser.kfs = new_anim;
+                } catch (Error error) {
+                    switch (error) {
+                        case ERROR_FILE_NOT_EXIST:
+                            TraceLog(LOG_WARNING, "file does not exist: %s", "mortal.json");
+                            break;
+                        case ERROR_INVALID_FILE:
+                            TraceLog(LOG_WARNING, "invalid file: %s", "mortal.json");
+                            break;
 
-                poser.reset();
-                poser.kfs = new_anim;
+                        default:
+                            TraceLog(LOG_FATAL, "unreachable: %d", error);
+                            break;
+                    }
+                };
+
+                UnloadDroppedFiles(files);
             }
 
             if (IsKeyPressed(KEY_R)) {
@@ -481,9 +508,24 @@ int main() {
             DrawText("import", rec.x + rec.width / 2 - msr.x / 2, rec.y + rec.height / 2 - msr.y / 2, font_sz, WHITE);
 
             if (!editing_name && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, rec)) {
-                std::vector<KF> new_anim = import_animation("mortal.json");
-                poser.reset();
-                poser.kfs = new_anim;
+                try {
+                    std::vector<KF> new_anim = import_animation("mortal.json");
+                    poser.reset();
+                    poser.kfs = new_anim;
+                } catch (Error error) {
+                    switch (error) {
+                        case ERROR_FILE_NOT_EXIST:
+                            TraceLog(LOG_WARNING, "file does not exist: %s", "mortal.json");
+                            break;
+                        case ERROR_INVALID_FILE:
+                            TraceLog(LOG_WARNING, "invalid file: %s", "mortal.json");
+                            break;
+
+                        default:
+                            TraceLog(LOG_FATAL, "unreachable: %d", error);
+                            break;
+                    }
+                };
             }
         }  // -- import export
 
