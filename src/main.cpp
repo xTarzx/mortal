@@ -139,6 +139,15 @@ int main() {
         int screen_height = GetRenderHeight();
         Vector2 mouse_pos = GetMousePosition();
 
+        if (IsFileDropped()) {
+            FilePathList files = LoadDroppedFiles();
+            std::vector<KF> new_anim = import_animation(files.paths[0]);
+            UnloadDroppedFiles(files);
+
+            poser.reset();
+            poser.kfs = new_anim;
+        }
+
         Vector2 cam_mov = {(float)IsKeyDown(KEY_D) - (float)IsKeyDown(KEY_A), (float)IsKeyDown(KEY_S) - (float)IsKeyDown(KEY_W)};
         int zoom_dir = IsKeyDown(KEY_E) - IsKeyDown(KEY_Q);
 
