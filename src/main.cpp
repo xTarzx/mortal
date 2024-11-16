@@ -227,43 +227,42 @@ int main() {
             }
         }
 
-        // add kf button
-        float button_width = screen_width * 0.05f;
-        float button_height = timeline_height * 0.25f;
-        Rectangle add_kf_btn = {screen_width - button_width, screen_height - timeline_height, button_width, button_height};
-
-        DrawRectangleRec(add_kf_btn, BLUE);
         {
+            // add kf button
+            float button_height = timeline_height * 0.25f;
             float font_sz = button_height * 0.8f;
-            Vector2 msr = MeasureTextEx(GetFontDefault(), "add", font_sz, 0.0f);
-            DrawText("add", add_kf_btn.x + add_kf_btn.width / 2 - msr.x / 2, add_kf_btn.y + add_kf_btn.height / 2 - msr.y / 2, font_sz, WHITE);
-        }
+            Vector2 add_msr = MeasureTextEx(GetFontDefault(), "insert", font_sz, 0.0f);
 
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, add_kf_btn)) {  // inserting
-            if (poser.kf + 1 >= poser.kfs.size()) {
-                poser.kfs.push_back(KF{.pose = Poses::zero, .frame_dur = 0});
+            float add_button_width = add_msr.x + screen_width * 0.01f;
+            Rectangle add_kf_btn = {screen_width - add_button_width, screen_height - timeline_height, add_button_width, button_height};
 
-            } else {
-                poser.kfs.insert(poser.kfs.begin() + poser.kf + 1, KF{.pose = Poses::zero, .frame_dur = 0});
+            DrawRectangleRec(add_kf_btn, BLUE);
+            DrawText("insert", add_kf_btn.x + add_kf_btn.width / 2 - add_msr.x / 2, add_kf_btn.y + add_kf_btn.height / 2 - add_msr.y / 2, font_sz, WHITE);
+
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, add_kf_btn)) {  // inserting
+                if (poser.kf + 1 >= poser.kfs.size()) {
+                    poser.kfs.push_back(KF{.pose = Poses::zero, .frame_dur = 0});
+
+                } else {
+                    poser.kfs.insert(poser.kfs.begin() + poser.kf + 1, KF{.pose = Poses::zero, .frame_dur = 0});
+                }
+                poser.next_kf();
             }
-            poser.next_kf();
-        }
 
-        // rm kf button
-        if (poser.kfs.size()) {
-            Rectangle rm_kf_btn = {screen_width - button_width * 2, screen_height - timeline_height, button_width, button_height};
-
-            DrawRectangleRec(rm_kf_btn, RED);
-            {
-                float font_sz = button_height * 0.8f;
+            // rm kf button
+            if (poser.kfs.size()) {
                 Vector2 msr = MeasureTextEx(GetFontDefault(), "del", font_sz, 0.0f);
-                DrawText("del", rm_kf_btn.x + rm_kf_btn.width / 2 - msr.x / 2, rm_kf_btn.y + rm_kf_btn.height / 2 - msr.y / 2, font_sz, WHITE);
-            }
+                float button_width = msr.x + screen_width * 0.01f;
+                Rectangle rm_kf_btn = {screen_width - add_button_width - button_width, screen_height - timeline_height, button_width, button_height};
 
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, rm_kf_btn)) {
-                poser.kfs.erase(poser.kfs.begin() + poser.kf, poser.kfs.begin() + poser.kf + 1);
-                if (poser.kf > 0) {
-                    poser.kf -= 1;
+                DrawRectangleRec(rm_kf_btn, RED);
+                DrawText("del", rm_kf_btn.x + rm_kf_btn.width / 2 - msr.x / 2, rm_kf_btn.y + rm_kf_btn.height / 2 - msr.y / 2, font_sz, WHITE);
+
+                if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, rm_kf_btn)) {
+                    poser.kfs.erase(poser.kfs.begin() + poser.kf, poser.kfs.begin() + poser.kf + 1);
+                    if (poser.kf > 0) {
+                        poser.kf -= 1;
+                    }
                 }
             }
         }
@@ -398,6 +397,7 @@ int main() {
         }  // pose editor
 
         {  // import export
+            float button_height = timeline_height * 0.25f;
             float font_sz = button_height * 0.8f;
             Vector2 msr = MeasureTextEx(GetFontDefault(), "export", font_sz, 0.0f);
             float export_width = msr.x * 1.35f;
