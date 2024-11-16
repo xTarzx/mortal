@@ -131,6 +131,8 @@ int main() {
 
     float ed_frame_dur = 0.0f;
 
+    Pose ed_pose_copy = Poses::zero;
+
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
         int screen_width = GetRenderWidth();
@@ -153,10 +155,17 @@ int main() {
 
         if (IsKeyPressed(KEY_P)) poser.play = !poser.play;
 
-        // if (IsKeyPressed(KEY_V)) {
-        //     k = (k + 1) % (sizeof(kfs) / sizeof(kfs[0]));
-        //     poser.kfs = kfs[k];
-        // }
+        if (IsKeyPressed(KEY_C)) {
+            if (poser.kfs.size() > 0) {
+                ed_pose_copy = poser.kfs[poser.kf].pose;
+            }
+        }
+
+        if (IsKeyPressed(KEY_V)) {
+            if (poser.kfs.size() > 0) {
+                poser.kfs[poser.kf].pose = ed_pose_copy;
+            }
+        }
 
         if (IsKeyPressed(KEY_SPACE)) {
             poser.next_kf();

@@ -20,13 +20,14 @@ KFs with a duration of 0 will not automatically switch to the next KF, requiring
 
 -   import/export:
 
-    -   file dialog
+    -   file dialogs
+    -   drag and drop
     -   error handling
 
 -   editor:
 
-    -   copy/paste
     -   move KF
+    -   KF name
 
 -   sim:
 
