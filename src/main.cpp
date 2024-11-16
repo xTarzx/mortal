@@ -231,15 +231,20 @@ int main() {
             // add kf button
             float button_height = timeline_height * 0.25f;
             float font_sz = button_height * 0.8f;
-            Vector2 add_msr = MeasureTextEx(GetFontDefault(), "insert", font_sz, 0.0f);
+            Vector2 add_msr = MeasureTextEx(GetFontDefault(), "add", font_sz, 0.0f);
 
             float add_button_width = add_msr.x + screen_width * 0.01f;
             Rectangle add_kf_btn = {screen_width - add_button_width, screen_height - timeline_height, add_button_width, button_height};
 
             DrawRectangleRec(add_kf_btn, BLUE);
-            DrawText("insert", add_kf_btn.x + add_kf_btn.width / 2 - add_msr.x / 2, add_kf_btn.y + add_kf_btn.height / 2 - add_msr.y / 2, font_sz, WHITE);
+            DrawText("add", add_kf_btn.x + add_kf_btn.width / 2 - add_msr.x / 2, add_kf_btn.y + add_kf_btn.height / 2 - add_msr.y / 2, font_sz, WHITE);
 
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, add_kf_btn)) {  // inserting
+            Vector2 ins_l_msr = MeasureTextEx(GetFontDefault(), "<", font_sz, 0.0f);
+            Rectangle ins_l_btn = {add_kf_btn.x - add_kf_btn.height, add_kf_btn.y, add_kf_btn.height, add_kf_btn.height};
+            DrawRectangleRec(ins_l_btn, DARKBLUE);
+            DrawText("<", ins_l_btn.x + ins_l_btn.width / 2 - ins_l_msr.x, ins_l_btn.y + ins_l_btn.height / 2 - ins_l_msr.y / 2, font_sz, WHITE);
+
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, add_kf_btn)) {  // insert to right
                 if (poser.kf + 1 >= poser.kfs.size()) {
                     poser.kfs.push_back(KF{.pose = Poses::zero, .frame_dur = 0});
 
@@ -248,12 +253,20 @@ int main() {
                 }
                 poser.next_kf();
             }
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, ins_l_btn)) {  // insert to left
+                if (poser.kf + 1 >= poser.kfs.size()) {
+                    poser.kfs.push_back(KF{.pose = Poses::zero, .frame_dur = 0});
+
+                } else {
+                    poser.kfs.insert(poser.kfs.begin() + poser.kf, KF{.pose = Poses::zero, .frame_dur = 0});
+                }
+            }
 
             // rm kf button
             if (poser.kfs.size()) {
                 Vector2 msr = MeasureTextEx(GetFontDefault(), "del", font_sz, 0.0f);
                 float button_width = msr.x + screen_width * 0.01f;
-                Rectangle rm_kf_btn = {screen_width - add_button_width - button_width, screen_height - timeline_height, button_width, button_height};
+                Rectangle rm_kf_btn = {screen_width - add_kf_btn.width - ins_l_btn.width - button_width * 1.25f, screen_height - timeline_height, button_width, button_height};
 
                 DrawRectangleRec(rm_kf_btn, RED);
                 DrawText("del", rm_kf_btn.x + rm_kf_btn.width / 2 - msr.x / 2, rm_kf_btn.y + rm_kf_btn.height / 2 - msr.y / 2, font_sz, WHITE);
