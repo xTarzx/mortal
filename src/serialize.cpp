@@ -67,7 +67,7 @@ KF deserialize_keyframe(json j) {
     KF kf = {
         .name = j["name"],
         .pose = deserialize_pose(j["pose"]),
-        .frame_dur = 0,
+        .frame_dur = j["frame_dur"],
     };
     return kf;
 };
