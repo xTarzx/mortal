@@ -147,7 +147,7 @@ int main() {
     char ed_kf_name_text[KF_NAME_MAX_LEN] = {0};
     bool editing_name = false;
     int ed_kf_name_idx = 0;
-    char* error_str = nullptr;
+    std::string error_str;
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
@@ -158,17 +158,20 @@ int main() {
         if (!editing_name) {
             if (IsFileDropped()) {
                 FilePathList files = LoadDroppedFiles();
+                char* filepath = files.paths[0];
                 try {
-                    std::vector<KF> new_anim = import_animation("mortal.json");
+                    std::vector<KF> new_anim = import_animation(filepath);
                     poser.reset();
                     poser.kfs = new_anim;
                 } catch (Error error) {
                     switch (error) {
                         case ERROR_FILE_NOT_EXIST:
-                            TraceLog(LOG_WARNING, "file does not exist: %s", "mortal.json");
+                            error_str = TextFormat("file does not exist: %s", filepath);
+                            TraceLog(LOG_WARNING, error_str.c_str());
                             break;
                         case ERROR_INVALID_FILE:
-                            TraceLog(LOG_WARNING, "invalid file: %s", "mortal.json");
+                            error_str = TextFormat("invalid file: %s", filepath);
+                            TraceLog(LOG_WARNING, error_str.c_str());
                             break;
 
                         default:
@@ -508,17 +511,20 @@ int main() {
             DrawText("import", rec.x + rec.width / 2 - msr.x / 2, rec.y + rec.height / 2 - msr.y / 2, font_sz, WHITE);
 
             if (!editing_name && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, rec)) {
+                char* filepath = "mortal.json";
                 try {
-                    std::vector<KF> new_anim = import_animation("mortal.json");
+                    std::vector<KF> new_anim = import_animation(filepath);
                     poser.reset();
                     poser.kfs = new_anim;
                 } catch (Error error) {
                     switch (error) {
                         case ERROR_FILE_NOT_EXIST:
-                            TraceLog(LOG_WARNING, "file does not exist: %s", "mortal.json");
+                            error_str = TextFormat("file does not exist: %s", filepath);
+                            TraceLog(LOG_WARNING, error_str.c_str());
                             break;
                         case ERROR_INVALID_FILE:
-                            TraceLog(LOG_WARNING, "invalid file: %s", "mortal.json");
+                            error_str = TextFormat("invalid file: %s", filepath);
+                            TraceLog(LOG_WARNING, error_str.c_str());
                             break;
 
                         default:
@@ -551,6 +557,15 @@ int main() {
                     TraceLog(LOG_INFO, "unhandled: %d", res);
                     break;
             }
+        }
+
+        if (!error_str.empty()) {
+            float err_rec_w = screen_width * 0.25;
+            float err_rec_h = screen_height * 0.18;
+            Rectangle err_rec = {screen_width / 2 - err_rec_w / 2, screen_height / 2 - err_rec_h / 2, err_rec_w, err_rec_h};
+            if (GuiMessageBox(err_rec, "Error", error_str.c_str(), "ok") > 0) {
+                error_str.clear();
+            };
         }
 
         EndDrawing();
