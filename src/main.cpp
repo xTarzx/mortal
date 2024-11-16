@@ -239,8 +239,14 @@ int main() {
             DrawText("add", add_kf_btn.x + add_kf_btn.width / 2 - msr.x / 2, add_kf_btn.y + add_kf_btn.height / 2 - msr.y / 2, font_sz, WHITE);
         }
 
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, add_kf_btn)) {
-            poser.kfs.push_back(KF{.pose = Poses::zero, .frame_dur = 0});
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, add_kf_btn)) {  // inserting
+            if (poser.kf + 1 >= poser.kfs.size()) {
+                poser.kfs.push_back(KF{.pose = Poses::zero, .frame_dur = 0});
+
+            } else {
+                poser.kfs.insert(poser.kfs.begin() + poser.kf + 1, KF{.pose = Poses::zero, .frame_dur = 0});
+            }
+            poser.next_kf();
         }
 
         // rm kf button

@@ -26,7 +26,7 @@ KFs with a duration of 0 will not automatically switch to the next KF, requiring
 -   editor:
 
     -   copy/paste
-    -   insert
+    -   insert (add is insert rn)
     -   move KF
 
 -   sim:
