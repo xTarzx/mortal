@@ -7,9 +7,15 @@ set(SOURCES
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
+set(EXTERNAL_DIR ${PROJECT_SOURCE_DIR}/external)
+
 target_include_directories(${PROJECT_NAME}
     PRIVATE
         ${PROJECT_SOURCE_DIR}/include
+        ${EXTERNAL_DIR}/raylib/src
+        ${EXTERNAL_DIR}/raygui/src
+        ${EXTERNAL_DIR}/box2d/include
+        ${EXTERNAL_DIR}/json/include
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib box2d)

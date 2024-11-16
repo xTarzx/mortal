@@ -4,3 +4,9 @@
 [submodule "external/box2d"]
 	path = external/box2d
 	url = https://github.com/erincatto/box2d.git
+[submodule "external/raygui"]
+	path = external/raygui
+	url = https://github.com/raysan5/raygui.git
+[submodule "external/json"]
+	path = external/json
+	url = https://github.com/nlohmann/json.git
