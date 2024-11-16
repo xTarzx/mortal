@@ -30,6 +30,7 @@ json serialize_pose(Pose pose) {
 json serialize_keyframe(KF kf) {
     json j;
 
+    j["name"] = kf.name;
     j["frame_dur"] = kf.frame_dur;
     j["pose"] = serialize_pose(kf.pose);
 
@@ -64,6 +65,7 @@ Pose deserialize_pose(json j) {
 };
 KF deserialize_keyframe(json j) {
     KF kf = {
+        .name = j["name"],
         .pose = deserialize_pose(j["pose"]),
         .frame_dur = 0,
     };

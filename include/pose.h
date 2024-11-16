@@ -2,6 +2,7 @@
 #include "common.h"
 #include "psik.h"
 #include <vector>
+#include <string>
 
 class Pose {
    public:
@@ -37,6 +38,7 @@ class Pose {
 };
 
 struct KF {
+    std::string name;
     Pose pose;
     int frame_dur;
 };

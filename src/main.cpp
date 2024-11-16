@@ -132,6 +132,9 @@ int main() {
     float ed_frame_dur = 0.0f;
 
     Pose ed_pose_copy = Poses::zero;
+    char ed_kf_name_text[KF_NAME_MAX_LEN] = {0};
+    bool editing_name = false;
+    int ed_kf_name_idx = 0;
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
@@ -139,56 +142,59 @@ int main() {
         int screen_height = GetRenderHeight();
         Vector2 mouse_pos = GetMousePosition();
 
-        if (IsFileDropped()) {
-            FilePathList files = LoadDroppedFiles();
-            std::vector<KF> new_anim = import_animation(files.paths[0]);
-            UnloadDroppedFiles(files);
+        if (!editing_name) {
+            if (IsFileDropped()) {
+                FilePathList files = LoadDroppedFiles();
+                std::vector<KF> new_anim = import_animation(files.paths[0]);
+                UnloadDroppedFiles(files);
 
-            poser.reset();
-            poser.kfs = new_anim;
-        }
-
-        Vector2 cam_mov = {(float)IsKeyDown(KEY_D) - (float)IsKeyDown(KEY_A), (float)IsKeyDown(KEY_S) - (float)IsKeyDown(KEY_W)};
-        int zoom_dir = IsKeyDown(KEY_E) - IsKeyDown(KEY_Q);
-
-        if (IsKeyPressed(KEY_R)) {
-            b2DestroyWorld(worldId);
-            worldId = b2CreateWorld(&worldDef);
-            int kf = poser.kf;
-            poser.reset();
-            if (!poser.play)
-                poser.kf = kf;
-            ground = Ground(worldId);
-            psik = Psik(worldId);
-        }
-
-        if (IsKeyPressed(KEY_P)) poser.play = !poser.play;
-
-        if (IsKeyPressed(KEY_C)) {
-            if (poser.kfs.size() > 0) {
-                ed_pose_copy = poser.kfs[poser.kf].pose;
+                poser.reset();
+                poser.kfs = new_anim;
             }
-        }
 
-        if (IsKeyPressed(KEY_V)) {
-            if (poser.kfs.size() > 0) {
-                poser.kfs[poser.kf].pose = ed_pose_copy;
+            if (IsKeyPressed(KEY_R)) {
+                b2DestroyWorld(worldId);
+                worldId = b2CreateWorld(&worldDef);
+                int kf = poser.kf;
+                poser.reset();
+                if (!poser.play)
+                    poser.kf = kf;
+                ground = Ground(worldId);
+                psik = Psik(worldId);
             }
-        }
 
-        if (IsKeyPressed(KEY_SPACE)) {
-            if (IsKeyDown(KEY_LEFT_SHIFT)) {
-                poser.prev_kf();
-            } else {
-                poser.next_kf();
+            if (IsKeyPressed(KEY_P)) poser.play = !poser.play;
+
+            if (IsKeyPressed(KEY_C)) {
+                if (poser.kfs.size() > 0) {
+                    ed_pose_copy = poser.kfs[poser.kf].pose;
+                }
             }
-        }
+
+            if (IsKeyPressed(KEY_V)) {
+                if (poser.kfs.size() > 0) {
+                    poser.kfs[poser.kf].pose = ed_pose_copy;
+                }
+            }
+
+            if (IsKeyPressed(KEY_SPACE)) {
+                if (IsKeyDown(KEY_LEFT_SHIFT)) {
+                    poser.prev_kf();
+                } else {
+                    poser.next_kf();
+                }
+            }
+
+            Vector2 cam_mov = {(float)IsKeyDown(KEY_D) - (float)IsKeyDown(KEY_A), (float)IsKeyDown(KEY_S) - (float)IsKeyDown(KEY_W)};
+            int zoom_dir = IsKeyDown(KEY_E) - IsKeyDown(KEY_Q);
+
+            camera.zoom += zoom_dir * zoom_speed * dt;
+            camera.offset = {screen_width / 2.0f, screen_height / 2.0f};
+            camera.target = Vector2Add(camera.target, Vector2Scale(cam_mov, dt * camera_speed));
+
+        }  // NOT EDITING NAME
 
         poser.update();
-
-        camera.zoom += zoom_dir * zoom_speed * dt;
-        camera.offset = {screen_width / 2.0f, screen_height / 2.0f};
-        camera.target = Vector2Add(camera.target, Vector2Scale(cam_mov, dt * camera_speed));
 
         b2World_Step(worldId, timeStep, subStepCount);
 
@@ -213,9 +219,17 @@ int main() {
         float padding = sz * 0.1f;
         float x = padding;
         float y = screen_height - timeline_height / 2 - sz / 2;
+
         for (int i = 0; i < poser.kfs.size(); i++) {
             Rectangle box = {x, y, sz, sz};
             DrawRectangleRec(box, GetColor(0x555555ff));
+
+            {  // kf name
+                const char* text = poser.kfs[i].name.c_str();
+                float font_sz = sz * 0.1f;
+                Vector2 msr = MeasureTextEx(GetFontDefault(), text, font_sz, 0.0f);
+                DrawText(text, box.x, box.y, font_sz, WHITE);
+            }
 
             const char* i_str = TextFormat("%d", i);
             float font_sz = sz * 0.8f;
@@ -229,12 +243,18 @@ int main() {
             msr = MeasureTextEx(GetFontDefault(), frame_dur_str, font_sz, 0.0f);
             DrawText(frame_dur_str, box.x, box.y + box.height - msr.y, font_sz, WHITE);
 
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, box)) {
-                poser.kf = i;
-                poser.frame = 0;
-            }
+            if (!editing_name) {
+                if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, box)) {
+                    poser.kf = i;
+                    poser.frame = 0;
+                }
 
-            // TODO: border
+                if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) && CheckCollisionPointRec(mouse_pos, box)) {
+                    ed_kf_name_idx = i;
+                    strcpy(ed_kf_name_text, poser.kfs[ed_kf_name_idx].name.c_str());
+                    editing_name = true;
+                };
+            }
 
             x += sz + padding;
         }
@@ -266,21 +286,23 @@ int main() {
             DrawRectangleRec(ins_l_btn, DARKBLUE);
             DrawText("<", ins_l_btn.x + ins_l_btn.width / 2 - ins_l_msr.x, ins_l_btn.y + ins_l_btn.height / 2 - ins_l_msr.y / 2, font_sz, WHITE);
 
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, add_kf_btn)) {  // insert to right
-                if (poser.kf + 1 >= poser.kfs.size()) {
-                    poser.kfs.push_back(KF{.pose = Poses::zero, .frame_dur = 0});
+            if (!editing_name) {
+                if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, add_kf_btn)) {  // insert to right
+                    if (poser.kf + 1 >= poser.kfs.size()) {
+                        poser.kfs.push_back(KF{.pose = Poses::zero, .frame_dur = 0});
 
-                } else {
-                    poser.kfs.insert(poser.kfs.begin() + poser.kf + 1, KF{.pose = Poses::zero, .frame_dur = 0});
+                    } else {
+                        poser.kfs.insert(poser.kfs.begin() + poser.kf + 1, KF{.pose = Poses::zero, .frame_dur = 0});
+                    }
+                    poser.next_kf();
                 }
-                poser.next_kf();
-            }
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, ins_l_btn)) {  // insert to left
-                if (poser.kf + 1 >= poser.kfs.size()) {
-                    poser.kfs.push_back(KF{.pose = Poses::zero, .frame_dur = 0});
+                if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, ins_l_btn)) {  // insert to left
+                    if (poser.kf + 1 >= poser.kfs.size()) {
+                        poser.kfs.push_back(KF{.pose = Poses::zero, .frame_dur = 0});
 
-                } else {
-                    poser.kfs.insert(poser.kfs.begin() + poser.kf, KF{.pose = Poses::zero, .frame_dur = 0});
+                    } else {
+                        poser.kfs.insert(poser.kfs.begin() + poser.kf, KF{.pose = Poses::zero, .frame_dur = 0});
+                    }
                 }
             }
 
@@ -293,7 +315,7 @@ int main() {
                 DrawRectangleRec(rm_kf_btn, RED);
                 DrawText("del", rm_kf_btn.x + rm_kf_btn.width / 2 - msr.x / 2, rm_kf_btn.y + rm_kf_btn.height / 2 - msr.y / 2, font_sz, WHITE);
 
-                if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, rm_kf_btn)) {
+                if (!editing_name && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, rm_kf_btn)) {
                     poser.kfs.erase(poser.kfs.begin() + poser.kf, poser.kfs.begin() + poser.kf + 1);
                     if (poser.kf > 0) {
                         poser.kf -= 1;
@@ -302,6 +324,9 @@ int main() {
             }
         }
 
+        // -- timeline
+
+        if (editing_name) GuiDisable();
         // pose editor
         if (poser.kfs.size() > 0) {
             Pose* cur_pose = &poser.kfs[poser.kf].pose;
@@ -429,7 +454,9 @@ int main() {
                 }
             }  // frame dur
 
-        }  // pose editor
+        }  // -- pose editor
+
+        if (editing_name) GuiEnable();
 
         {  // import export
             float button_height = timeline_height * 0.25f;
@@ -441,7 +468,7 @@ int main() {
             DrawRectangleRec(rec, BLUE);
             DrawText("export", rec.x + rec.width / 2 - msr.x / 2, rec.y + rec.height / 2 - msr.y / 2, font_sz, WHITE);
 
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, rec)) {
+            if (!editing_name && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, rec)) {
                 export_animation(poser.kfs);
             }
 
@@ -452,10 +479,34 @@ int main() {
             DrawRectangleRec(rec, BLUE);
             DrawText("import", rec.x + rec.width / 2 - msr.x / 2, rec.y + rec.height / 2 - msr.y / 2, font_sz, WHITE);
 
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, rec)) {
+            if (!editing_name && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, rec)) {
                 std::vector<KF> new_anim = import_animation("mortal.json");
                 poser.reset();
                 poser.kfs = new_anim;
+            }
+        }  // -- import export
+
+        if (editing_name) {  // keyframe name popup
+            float kf_name_rec_w = screen_width * 0.25;
+            float kf_name_rec_h = screen_height * 0.18;
+            Rectangle kf_name_rec = {screen_width / 2 - kf_name_rec_w / 2, screen_height / 2 - kf_name_rec_h / 2, kf_name_rec_w, kf_name_rec_h};
+            int res = GuiTextInputBox(kf_name_rec, "keyframe name", "", "ok;cancel", ed_kf_name_text, KF_NAME_MAX_LEN, nullptr);
+            switch (res) {
+                case 1:  // ok
+                    poser.kfs[ed_kf_name_idx].name = ed_kf_name_text;
+                    memset(ed_kf_name_text, 0, KF_NAME_MAX_LEN);
+                    editing_name = false;
+                    break;
+                case 0:
+                case 2:  // cancel
+                    memset(ed_kf_name_text, 0, KF_NAME_MAX_LEN);
+                    editing_name = false;
+                    break;
+                case -1:
+                    break;
+                default:
+                    TraceLog(LOG_INFO, "unhandled: %d", res);
+                    break;
             }
         }
 

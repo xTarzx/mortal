@@ -17,6 +17,8 @@ const float PPM = 100;
 #define ELBOW_LOWER_ANGLE (b2_pi * 0.005f)
 #define ELBOW_UPPER_ANGLE (b2_pi * 0.85f)
 
+#define KF_NAME_MAX_LEN 15
+
 enum Group {
     PLAYER = 0x02,
 };
