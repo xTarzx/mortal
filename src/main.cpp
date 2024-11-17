@@ -72,6 +72,9 @@ struct State {
 
     bool disable_editor = false;
 
+    float timeline_scroll = 0.0f;
+    bool timeline_drag = false;
+
     void enter_name_edit() {
         editing_name = true;
         disable_sliders = true;
@@ -89,6 +92,16 @@ struct State {
         disable_timeline_interact = false;
         disable_imp_exp = false;
     };
+
+    void enter_timeline_drag() {
+        timeline_drag = true;
+        disable_sliders = true;
+    }
+
+    void exit_timeline_drag() {
+        timeline_drag = false;
+        disable_sliders = false;
+    }
 };
 
 struct Ground {
@@ -274,15 +287,17 @@ int main() {
         EndMode2D();
         // timeline
         float timeline_height = screen_height * 0.20f;
+        if (state.timeline_drag && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) state.exit_timeline_drag();
         if (!state.disable_editor) {
             Rectangle timeline_rec = {0.0f, screen_height - timeline_height, (float)screen_width, timeline_height};
             DrawRectangleRec(timeline_rec, GetColor(0x333333ff));
 
             float sz = timeline_height * 0.65f;
             float padding = sz * 0.1f;
-            float x = padding;
+            float x = padding + state.timeline_scroll;
             float y = screen_height - timeline_height / 2 - sz / 2;
 
+            bool on_kf = false;
             for (int i = 0; i < poser.kfs.size(); i++) {
                 Rectangle box = {x, y, sz, sz};
                 DrawRectangleRec(box, GetColor(0x555555ff));
@@ -319,8 +334,16 @@ int main() {
                         state.enter_name_edit();
                     };
                 }
+                if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, timeline_rec)) {
+                    state.enter_timeline_drag();
+                }
 
                 x += sz + padding;
+            }
+
+                        if (state.timeline_drag) {
+                Vector2 mouse_rel = GetMouseDelta();
+                state.timeline_scroll += mouse_rel.x;
             }
 
             {  // auto
