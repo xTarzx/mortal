@@ -328,7 +328,7 @@ int main() {
                     poser.next_kf();
                 }
                 if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, ins_l_btn)) {  // insert to left
-                    if (poser.kf + 1 >= poser.kfs.size()) {
+                    if (poser.kfs.size() == 0) {
                         poser.kfs.push_back(KF{.pose = Poses::zero, .frame_dur = 0});
 
                     } else {
