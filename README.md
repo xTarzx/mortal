@@ -28,8 +28,7 @@ KFs with a duration of 0 will not automatically switch to the next KF, requiring
 
 -   editor:
 
-    -   move KF
-    -   scroll timeline
+    -   move KF (can be done by copying and pasting)
 
 -   sim:
     -   give bro a spine
