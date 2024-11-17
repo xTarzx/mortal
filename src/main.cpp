@@ -70,6 +70,8 @@ struct State {
     bool disable_timeline_interact = false;
     bool disable_imp_exp = false;
 
+    bool disable_editor = false;
+
     void enter_name_edit() {
         editing_name = true;
         disable_sliders = true;
@@ -243,6 +245,10 @@ int main() {
                 }
             }
 
+            if (IsKeyPressed(KEY_H)) {
+                state.disable_editor = !state.disable_editor;
+            }
+
             Vector2 cam_mov = {(float)IsKeyDown(KEY_D) - (float)IsKeyDown(KEY_A), (float)IsKeyDown(KEY_S) - (float)IsKeyDown(KEY_W)};
             int zoom_dir = IsKeyDown(KEY_E) - IsKeyDown(KEY_Q);
 
@@ -266,258 +272,257 @@ int main() {
         psik.draw();
 
         EndMode2D();
-
         // timeline
-
         float timeline_height = screen_height * 0.20f;
-        Rectangle timeline_rec = {0.0f, screen_height - timeline_height, (float)screen_width, timeline_height};
-        DrawRectangleRec(timeline_rec, GetColor(0x333333ff));
+        if (!state.disable_editor) {
+            Rectangle timeline_rec = {0.0f, screen_height - timeline_height, (float)screen_width, timeline_height};
+            DrawRectangleRec(timeline_rec, GetColor(0x333333ff));
 
-        float sz = timeline_height * 0.65f;
-        float padding = sz * 0.1f;
-        float x = padding;
-        float y = screen_height - timeline_height / 2 - sz / 2;
+            float sz = timeline_height * 0.65f;
+            float padding = sz * 0.1f;
+            float x = padding;
+            float y = screen_height - timeline_height / 2 - sz / 2;
 
-        for (int i = 0; i < poser.kfs.size(); i++) {
-            Rectangle box = {x, y, sz, sz};
-            DrawRectangleRec(box, GetColor(0x555555ff));
+            for (int i = 0; i < poser.kfs.size(); i++) {
+                Rectangle box = {x, y, sz, sz};
+                DrawRectangleRec(box, GetColor(0x555555ff));
 
-            {  // kf name
-                const char* text = poser.kfs[i].name.c_str();
-                float font_sz = sz * 0.1f;
-                Vector2 msr = MeasureTextEx(GetFontDefault(), text, font_sz, 0.0f);
-                DrawText(text, box.x, box.y, font_sz, WHITE);
-            }
-
-            const char* i_str = TextFormat("%d", i);
-            float font_sz = sz * 0.8f;
-            Vector2 msr = MeasureTextEx(GetFontDefault(), i_str, font_sz, 0.0f);
-            DrawText(i_str, box.x + box.width / 2 - msr.x / 2, box.y + box.height / 2 - msr.y / 2, font_sz, i == poser.kf ? BLUE : WHITE);
-
-            KF& kf = poser.kfs[i];
-
-            const char* frame_dur_str = TextFormat("dur: %d/%d", i == poser.kf ? poser.frame : 0, kf.frame_dur);
-            font_sz = sz * 0.2f;
-            msr = MeasureTextEx(GetFontDefault(), frame_dur_str, font_sz, 0.0f);
-            DrawText(frame_dur_str, box.x, box.y + box.height - msr.y, font_sz, WHITE);
-
-            if (!state.disable_timeline_interact) {
-                if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, box)) {
-                    poser.play = false;
-                    poser.kf = i;
-                    poser.frame = 0;
+                {  // kf name
+                    const char* text = poser.kfs[i].name.c_str();
+                    float font_sz = sz * 0.1f;
+                    Vector2 msr = MeasureTextEx(GetFontDefault(), text, font_sz, 0.0f);
+                    DrawText(text, box.x, box.y, font_sz, WHITE);
                 }
 
-                if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) && CheckCollisionPointRec(mouse_pos, box)) {
-                    state.ed_kf_name_idx = i;
-                    strcpy(state.ed_kf_name_text, poser.kfs[state.ed_kf_name_idx].name.c_str());
-                    state.enter_name_edit();
-                };
-            }
+                const char* i_str = TextFormat("%d", i);
+                float font_sz = sz * 0.8f;
+                Vector2 msr = MeasureTextEx(GetFontDefault(), i_str, font_sz, 0.0f);
+                DrawText(i_str, box.x + box.width / 2 - msr.x / 2, box.y + box.height / 2 - msr.y / 2, font_sz, i == poser.kf ? BLUE : WHITE);
 
-            x += sz + padding;
-        }
+                KF& kf = poser.kfs[i];
 
-        {  // auto
-            float circle_rad = sz * 0.1f;
-            float x = timeline_rec.x + timeline_rec.width - circle_rad;
-            float y = timeline_rec.y + timeline_rec.height - circle_rad;
+                const char* frame_dur_str = TextFormat("dur: %d/%d", i == poser.kf ? poser.frame : 0, kf.frame_dur);
+                font_sz = sz * 0.2f;
+                msr = MeasureTextEx(GetFontDefault(), frame_dur_str, font_sz, 0.0f);
+                DrawText(frame_dur_str, box.x, box.y + box.height - msr.y, font_sz, WHITE);
 
-            if (poser.play) {
-                DrawCircle(x, y, circle_rad, RED);
-            }
-        }
-
-        {
-            // add kf button
-            float button_height = timeline_height * 0.25f;
-            float font_sz = button_height * 0.8f;
-            Vector2 add_msr = MeasureTextEx(GetFontDefault(), "add", font_sz, 0.0f);
-
-            float add_button_width = add_msr.x + screen_width * 0.01f;
-            Rectangle add_kf_btn = {screen_width - add_button_width, screen_height - timeline_height, add_button_width, button_height};
-
-            DrawRectangleRec(add_kf_btn, BLUE);
-            DrawText("add", add_kf_btn.x + add_kf_btn.width / 2 - add_msr.x / 2, add_kf_btn.y + add_kf_btn.height / 2 - add_msr.y / 2, font_sz, WHITE);
-
-            Vector2 ins_l_msr = MeasureTextEx(GetFontDefault(), "<", font_sz, 0.0f);
-            Rectangle ins_l_btn = {add_kf_btn.x - add_kf_btn.height, add_kf_btn.y, add_kf_btn.height, add_kf_btn.height};
-            DrawRectangleRec(ins_l_btn, DARKBLUE);
-            DrawText("<", ins_l_btn.x + ins_l_btn.width / 2 - ins_l_msr.x, ins_l_btn.y + ins_l_btn.height / 2 - ins_l_msr.y / 2, font_sz, WHITE);
-
-            if (!state.disable_timeline_interact) {
-                if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, add_kf_btn)) {  // insert to right
-                    if (poser.kf + 1 >= poser.kfs.size()) {
-                        poser.kfs.push_back(KF{.pose = Poses::zero, .frame_dur = 0});
-
-                    } else {
-                        poser.kfs.insert(poser.kfs.begin() + poser.kf + 1, KF{.pose = Poses::zero, .frame_dur = 0});
+                if (!state.disable_timeline_interact) {
+                    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, box)) {
+                        poser.play = false;
+                        poser.kf = i;
+                        poser.frame = 0;
                     }
-                    poser.next_kf();
-                    poser.play = false;
-                }
-                if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, ins_l_btn)) {  // insert to left
-                    if (poser.kfs.size() == 0) {
-                        poser.kfs.push_back(KF{.pose = Poses::zero, .frame_dur = 0});
 
-                    } else {
-                        poser.kfs.insert(poser.kfs.begin() + poser.kf, KF{.pose = Poses::zero, .frame_dur = 0});
-                    }
-                    poser.play = false;
+                    if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) && CheckCollisionPointRec(mouse_pos, box)) {
+                        state.ed_kf_name_idx = i;
+                        strcpy(state.ed_kf_name_text, poser.kfs[state.ed_kf_name_idx].name.c_str());
+                        state.enter_name_edit();
+                    };
+                }
+
+                x += sz + padding;
+            }
+
+            {  // auto
+                float circle_rad = sz * 0.1f;
+                float x = timeline_rec.x + timeline_rec.width - circle_rad;
+                float y = timeline_rec.y + timeline_rec.height - circle_rad;
+
+                if (poser.play) {
+                    DrawCircle(x, y, circle_rad, RED);
                 }
             }
 
-            // rm kf button
-            if (poser.kfs.size()) {
-                Vector2 msr = MeasureTextEx(GetFontDefault(), "del", font_sz, 0.0f);
-                float button_width = msr.x + screen_width * 0.01f;
-                Rectangle rm_kf_btn = {screen_width - add_kf_btn.width - ins_l_btn.width - button_width * 1.25f, screen_height - timeline_height, button_width, button_height};
+            {
+                // add kf button
+                float button_height = timeline_height * 0.25f;
+                float font_sz = button_height * 0.8f;
+                Vector2 add_msr = MeasureTextEx(GetFontDefault(), "add", font_sz, 0.0f);
 
-                DrawRectangleRec(rm_kf_btn, RED);
-                DrawText("del", rm_kf_btn.x + rm_kf_btn.width / 2 - msr.x / 2, rm_kf_btn.y + rm_kf_btn.height / 2 - msr.y / 2, font_sz, WHITE);
+                float add_button_width = add_msr.x + screen_width * 0.01f;
+                Rectangle add_kf_btn = {screen_width - add_button_width, screen_height - timeline_height, add_button_width, button_height};
 
-                if (!state.disable_timeline_interact && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, rm_kf_btn)) {
-                    poser.kfs.erase(poser.kfs.begin() + poser.kf, poser.kfs.begin() + poser.kf + 1);
-                    if (poser.kf > 0) {
-                        poser.kf -= 1;
+                DrawRectangleRec(add_kf_btn, BLUE);
+                DrawText("add", add_kf_btn.x + add_kf_btn.width / 2 - add_msr.x / 2, add_kf_btn.y + add_kf_btn.height / 2 - add_msr.y / 2, font_sz, WHITE);
+
+                Vector2 ins_l_msr = MeasureTextEx(GetFontDefault(), "<", font_sz, 0.0f);
+                Rectangle ins_l_btn = {add_kf_btn.x - add_kf_btn.height, add_kf_btn.y, add_kf_btn.height, add_kf_btn.height};
+                DrawRectangleRec(ins_l_btn, DARKBLUE);
+                DrawText("<", ins_l_btn.x + ins_l_btn.width / 2 - ins_l_msr.x, ins_l_btn.y + ins_l_btn.height / 2 - ins_l_msr.y / 2, font_sz, WHITE);
+
+                if (!state.disable_timeline_interact) {
+                    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, add_kf_btn)) {  // insert to right
+                        if (poser.kf + 1 >= poser.kfs.size()) {
+                            poser.kfs.push_back(KF{.pose = Poses::zero, .frame_dur = 0});
+
+                        } else {
+                            poser.kfs.insert(poser.kfs.begin() + poser.kf + 1, KF{.pose = Poses::zero, .frame_dur = 0});
+                        }
+                        poser.next_kf();
+                        poser.play = false;
                     }
-                    poser.play = false;
+                    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, ins_l_btn)) {  // insert to left
+                        if (poser.kfs.size() == 0) {
+                            poser.kfs.push_back(KF{.pose = Poses::zero, .frame_dur = 0});
+
+                        } else {
+                            poser.kfs.insert(poser.kfs.begin() + poser.kf, KF{.pose = Poses::zero, .frame_dur = 0});
+                        }
+                        poser.play = false;
+                    }
+                }
+
+                // rm kf button
+                if (poser.kfs.size()) {
+                    Vector2 msr = MeasureTextEx(GetFontDefault(), "del", font_sz, 0.0f);
+                    float button_width = msr.x + screen_width * 0.01f;
+                    Rectangle rm_kf_btn = {screen_width - add_kf_btn.width - ins_l_btn.width - button_width * 1.25f, screen_height - timeline_height, button_width, button_height};
+
+                    DrawRectangleRec(rm_kf_btn, RED);
+                    DrawText("del", rm_kf_btn.x + rm_kf_btn.width / 2 - msr.x / 2, rm_kf_btn.y + rm_kf_btn.height / 2 - msr.y / 2, font_sz, WHITE);
+
+                    if (!state.disable_timeline_interact && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, rm_kf_btn)) {
+                        poser.kfs.erase(poser.kfs.begin() + poser.kf, poser.kfs.begin() + poser.kf + 1);
+                        if (poser.kf > 0) {
+                            poser.kf -= 1;
+                        }
+                        poser.play = false;
+                    }
                 }
             }
+
+            // -- timeline
+
+            if (state.disable_sliders) GuiDisable();
+            // pose editor
+            if (poser.kfs.size() > 0) {
+                Pose* cur_pose = &poser.kfs[poser.kf].pose;
+
+                {  // left
+
+                    float slider_width = screen_width * 0.12f;
+                    float slider_height = screen_height * 0.04f;
+
+                    float ed_x = 0.0f;
+                    float ed_y = screen_height * 0.25f;
+
+                    // shoulder
+                    Rectangle l_shoulder_angle_slider = {ed_x, ed_y, slider_width, slider_height};
+                    GuiSlider(l_shoulder_angle_slider, "", TextFormat("l shoulder angle: %.2f", cur_pose->l_shoulder_angle * RAD2DEG), &cur_pose->l_shoulder_angle, SHOULDER_LOWER_ANGLE, SHOULDER_UPPER_ANGLE);
+
+                    ed_y += slider_height;
+                    Rectangle l_shoulder_force_slider = {ed_x, ed_y, slider_width, slider_height};
+                    GuiSlider(l_shoulder_force_slider, "", TextFormat("l shoulder force: %.2f", cur_pose->l_shoulder_force), &cur_pose->l_shoulder_force, 0.0f, b2RevoluteJoint_GetMaxMotorTorque(psik.l_shoulderJointId));
+
+                    // elbow
+                    ed_y += slider_height;
+                    Rectangle l_elbow_angle_slider = {ed_x, ed_y, slider_width, slider_height};
+                    GuiSlider(l_elbow_angle_slider, "", TextFormat("l elbow angle: %.2f", cur_pose->l_elbow_angle * RAD2DEG), &cur_pose->l_elbow_angle, ELBOW_LOWER_ANGLE, ELBOW_UPPER_ANGLE);
+
+                    ed_y += slider_height;
+                    Rectangle l_elbow_force_slider = {ed_x, ed_y, slider_width, slider_height};
+                    GuiSlider(l_elbow_force_slider, "", TextFormat("l elbow force: %.2f", cur_pose->l_elbow_force), &cur_pose->l_elbow_force, 0.0f, b2RevoluteJoint_GetMaxMotorTorque(psik.l_elbowJointId));
+
+                    // hip
+                    ed_y += slider_height;
+                    Rectangle l_hip_angle_slider = {ed_x, ed_y, slider_width, slider_height};
+                    GuiSlider(l_hip_angle_slider, "", TextFormat("l hip angle: %.2f", cur_pose->l_hip_angle * RAD2DEG), &cur_pose->l_hip_angle, HIP_LOWER_ANGLE, HIP_UPPER_ANGLE);
+
+                    ed_y += slider_height;
+                    Rectangle l_hip_force_slider = {ed_x, ed_y, slider_width, slider_height};
+                    GuiSlider(l_hip_force_slider, "", TextFormat("l hip force: %.2f", cur_pose->l_hip_force), &cur_pose->l_hip_force, 0.0f, b2RevoluteJoint_GetMaxMotorTorque(psik.l_hipJointId));
+
+                    // knee
+                    ed_y += slider_height;
+                    Rectangle l_knee_angle_slider = {ed_x, ed_y, slider_width, slider_height};
+                    GuiSlider(l_knee_angle_slider, "", TextFormat("l knee angle: %.2f", cur_pose->l_knee_angle * RAD2DEG), &cur_pose->l_knee_angle, KNEE_LOWER_ANGLE, KNEE_UPPER_ANGLE);
+
+                    ed_y += slider_height;
+                    Rectangle l_knee_force_slider = {ed_x, ed_y, slider_width, slider_height};
+                    GuiSlider(l_knee_force_slider, "", TextFormat("l knee force: %.2f", cur_pose->l_knee_force), &cur_pose->l_knee_force, 0.0f, b2RevoluteJoint_GetMaxMotorTorque(psik.l_kneeJointId));
+
+                    // ankle
+                    ed_y += slider_height;
+                    Rectangle l_ankle_angle_slider = {ed_x, ed_y, slider_width, slider_height};
+                    GuiSlider(l_ankle_angle_slider, "", TextFormat("l ankle angle: %.2f", cur_pose->l_ankle_angle * RAD2DEG), &cur_pose->l_ankle_angle, ANKLE_LOWER_ANGLE, ANKLE_UPPER_ANGLE);
+
+                    ed_y += slider_height;
+                    Rectangle l_ankle_force_slider = {ed_x, ed_y, slider_width, slider_height};
+                    GuiSlider(l_ankle_force_slider, "", TextFormat("l ankle force: %.2f", cur_pose->l_ankle_force), &cur_pose->l_ankle_force, 0.0f, b2RevoluteJoint_GetMaxMotorTorque(psik.l_ankleJointId));
+                }  // left
+
+                {  // right
+
+                    float slider_width = screen_width * 0.12f;
+                    float slider_height = screen_height * 0.04f;
+
+                    float ed_x = screen_width - slider_width;
+                    float ed_y = screen_height * 0.25f;
+
+                    // shoulder
+                    Rectangle r_shoulder_angle_slider = {ed_x, ed_y, slider_width, slider_height};
+                    GuiSlider(r_shoulder_angle_slider, TextFormat("r shoulder angle: %.2f", cur_pose->r_shoulder_angle * RAD2DEG), "", &cur_pose->r_shoulder_angle, SHOULDER_LOWER_ANGLE, SHOULDER_UPPER_ANGLE);
+
+                    ed_y += slider_height;
+                    Rectangle r_shoulder_force_slider = {ed_x, ed_y, slider_width, slider_height};
+                    GuiSlider(r_shoulder_force_slider, TextFormat("r shoulder force: %.2f", cur_pose->r_shoulder_force), "", &cur_pose->r_shoulder_force, 0.0f, b2RevoluteJoint_GetMaxMotorTorque(psik.r_shoulderJointId));
+
+                    // elbow
+                    ed_y += slider_height;
+                    Rectangle r_elbow_angle_slider = {ed_x, ed_y, slider_width, slider_height};
+                    GuiSlider(r_elbow_angle_slider, TextFormat("r elbow angle: %.2f", cur_pose->r_elbow_angle * RAD2DEG), "", &cur_pose->r_elbow_angle, ELBOW_LOWER_ANGLE, ELBOW_UPPER_ANGLE);
+
+                    ed_y += slider_height;
+                    Rectangle r_elbow_force_slider = {ed_x, ed_y, slider_width, slider_height};
+                    GuiSlider(r_elbow_force_slider, TextFormat("r elbow force: %.2f", cur_pose->r_elbow_force), "", &cur_pose->r_elbow_force, 0.0f, b2RevoluteJoint_GetMaxMotorTorque(psik.r_elbowJointId));
+
+                    // hip
+                    ed_y += slider_height;
+                    Rectangle r_hip_angle_slider = {ed_x, ed_y, slider_width, slider_height};
+                    GuiSlider(r_hip_angle_slider, TextFormat("r hip angle: %.2f", cur_pose->r_hip_angle * RAD2DEG), "", &cur_pose->r_hip_angle, HIP_LOWER_ANGLE, HIP_UPPER_ANGLE);
+
+                    ed_y += slider_height;
+                    Rectangle r_hip_force_slider = {ed_x, ed_y, slider_width, slider_height};
+                    GuiSlider(r_hip_force_slider, TextFormat("r hip force: %.2f", cur_pose->r_hip_force), "", &cur_pose->r_hip_force, 0.0f, b2RevoluteJoint_GetMaxMotorTorque(psik.r_hipJointId));
+
+                    // knee
+                    ed_y += slider_height;
+                    Rectangle r_knee_angle_slider = {ed_x, ed_y, slider_width, slider_height};
+                    GuiSlider(r_knee_angle_slider, TextFormat("r knee angle: %.2f", cur_pose->r_knee_angle * RAD2DEG), "", &cur_pose->r_knee_angle, KNEE_LOWER_ANGLE, KNEE_UPPER_ANGLE);
+
+                    ed_y += slider_height;
+                    Rectangle r_knee_force_slider = {ed_x, ed_y, slider_width, slider_height};
+                    GuiSlider(r_knee_force_slider, TextFormat("r knee force: %.2f", cur_pose->r_knee_force), "", &cur_pose->r_knee_force, 0.0f, b2RevoluteJoint_GetMaxMotorTorque(psik.r_kneeJointId));
+
+                    // ankle
+                    ed_y += slider_height;
+                    Rectangle r_ankle_angle_slider = {ed_x, ed_y, slider_width, slider_height};
+                    GuiSlider(r_ankle_angle_slider, TextFormat("r ankle angle: %.2f", cur_pose->r_ankle_angle * RAD2DEG), "", &cur_pose->r_ankle_angle, ANKLE_LOWER_ANGLE, ANKLE_UPPER_ANGLE);
+
+                    ed_y += slider_height;
+                    Rectangle r_ankle_force_slider = {ed_x, ed_y, slider_width, slider_height};
+                    GuiSlider(r_ankle_force_slider, TextFormat("r ankle force: %.2f", cur_pose->r_ankle_force), "", &cur_pose->r_ankle_force, 0.0f, b2RevoluteJoint_GetMaxMotorTorque(psik.r_ankleJointId));
+                }  // right
+
+                {  // frame dur
+                    float slider_width = screen_width * 0.15f;
+                    float slider_height = screen_height * 0.04f;
+                    state.ed_frame_dur = poser.kfs[poser.kf].frame_dur;
+
+                    float ed_x = 0.0f;
+                    float ed_y = screen_height - timeline_height - slider_height;
+
+                    Rectangle frame_dur_rec = {ed_x, ed_y, slider_width, slider_height};
+                    GuiSlider(frame_dur_rec, "", TextFormat("frame duration"), &state.ed_frame_dur, 0.0f, 100.0f);
+                    int ed_dur = std::round(state.ed_frame_dur);
+                    if (ed_dur != poser.kfs[poser.kf].frame_dur) {
+                        poser.play = false;
+                        poser.kfs[poser.kf].frame_dur = ed_dur;
+                    }
+                }  // frame dur
+
+            }  // -- pose editor
         }
-
-        // -- timeline
-
-        if (state.disable_sliders) GuiDisable();
-        // pose editor
-        if (poser.kfs.size() > 0) {
-            Pose* cur_pose = &poser.kfs[poser.kf].pose;
-
-            {  // left
-
-                float slider_width = screen_width * 0.12f;
-                float slider_height = screen_height * 0.04f;
-
-                float ed_x = 0.0f;
-                float ed_y = screen_height * 0.25f;
-
-                // shoulder
-                Rectangle l_shoulder_angle_slider = {ed_x, ed_y, slider_width, slider_height};
-                GuiSlider(l_shoulder_angle_slider, "", TextFormat("l shoulder angle: %.2f", cur_pose->l_shoulder_angle * RAD2DEG), &cur_pose->l_shoulder_angle, SHOULDER_LOWER_ANGLE, SHOULDER_UPPER_ANGLE);
-
-                ed_y += slider_height;
-                Rectangle l_shoulder_force_slider = {ed_x, ed_y, slider_width, slider_height};
-                GuiSlider(l_shoulder_force_slider, "", TextFormat("l shoulder force: %.2f", cur_pose->l_shoulder_force), &cur_pose->l_shoulder_force, 0.0f, b2RevoluteJoint_GetMaxMotorTorque(psik.l_shoulderJointId));
-
-                // elbow
-                ed_y += slider_height;
-                Rectangle l_elbow_angle_slider = {ed_x, ed_y, slider_width, slider_height};
-                GuiSlider(l_elbow_angle_slider, "", TextFormat("l elbow angle: %.2f", cur_pose->l_elbow_angle * RAD2DEG), &cur_pose->l_elbow_angle, ELBOW_LOWER_ANGLE, ELBOW_UPPER_ANGLE);
-
-                ed_y += slider_height;
-                Rectangle l_elbow_force_slider = {ed_x, ed_y, slider_width, slider_height};
-                GuiSlider(l_elbow_force_slider, "", TextFormat("l elbow force: %.2f", cur_pose->l_elbow_force), &cur_pose->l_elbow_force, 0.0f, b2RevoluteJoint_GetMaxMotorTorque(psik.l_elbowJointId));
-
-                // hip
-                ed_y += slider_height;
-                Rectangle l_hip_angle_slider = {ed_x, ed_y, slider_width, slider_height};
-                GuiSlider(l_hip_angle_slider, "", TextFormat("l hip angle: %.2f", cur_pose->l_hip_angle * RAD2DEG), &cur_pose->l_hip_angle, HIP_LOWER_ANGLE, HIP_UPPER_ANGLE);
-
-                ed_y += slider_height;
-                Rectangle l_hip_force_slider = {ed_x, ed_y, slider_width, slider_height};
-                GuiSlider(l_hip_force_slider, "", TextFormat("l hip force: %.2f", cur_pose->l_hip_force), &cur_pose->l_hip_force, 0.0f, b2RevoluteJoint_GetMaxMotorTorque(psik.l_hipJointId));
-
-                // knee
-                ed_y += slider_height;
-                Rectangle l_knee_angle_slider = {ed_x, ed_y, slider_width, slider_height};
-                GuiSlider(l_knee_angle_slider, "", TextFormat("l knee angle: %.2f", cur_pose->l_knee_angle * RAD2DEG), &cur_pose->l_knee_angle, KNEE_LOWER_ANGLE, KNEE_UPPER_ANGLE);
-
-                ed_y += slider_height;
-                Rectangle l_knee_force_slider = {ed_x, ed_y, slider_width, slider_height};
-                GuiSlider(l_knee_force_slider, "", TextFormat("l knee force: %.2f", cur_pose->l_knee_force), &cur_pose->l_knee_force, 0.0f, b2RevoluteJoint_GetMaxMotorTorque(psik.l_kneeJointId));
-
-                // ankle
-                ed_y += slider_height;
-                Rectangle l_ankle_angle_slider = {ed_x, ed_y, slider_width, slider_height};
-                GuiSlider(l_ankle_angle_slider, "", TextFormat("l ankle angle: %.2f", cur_pose->l_ankle_angle * RAD2DEG), &cur_pose->l_ankle_angle, ANKLE_LOWER_ANGLE, ANKLE_UPPER_ANGLE);
-
-                ed_y += slider_height;
-                Rectangle l_ankle_force_slider = {ed_x, ed_y, slider_width, slider_height};
-                GuiSlider(l_ankle_force_slider, "", TextFormat("l ankle force: %.2f", cur_pose->l_ankle_force), &cur_pose->l_ankle_force, 0.0f, b2RevoluteJoint_GetMaxMotorTorque(psik.l_ankleJointId));
-            }  // left
-
-            {  // right
-
-                float slider_width = screen_width * 0.12f;
-                float slider_height = screen_height * 0.04f;
-
-                float ed_x = screen_width - slider_width;
-                float ed_y = screen_height * 0.25f;
-
-                // shoulder
-                Rectangle r_shoulder_angle_slider = {ed_x, ed_y, slider_width, slider_height};
-                GuiSlider(r_shoulder_angle_slider, TextFormat("r shoulder angle: %.2f", cur_pose->r_shoulder_angle * RAD2DEG), "", &cur_pose->r_shoulder_angle, SHOULDER_LOWER_ANGLE, SHOULDER_UPPER_ANGLE);
-
-                ed_y += slider_height;
-                Rectangle r_shoulder_force_slider = {ed_x, ed_y, slider_width, slider_height};
-                GuiSlider(r_shoulder_force_slider, TextFormat("r shoulder force: %.2f", cur_pose->r_shoulder_force), "", &cur_pose->r_shoulder_force, 0.0f, b2RevoluteJoint_GetMaxMotorTorque(psik.r_shoulderJointId));
-
-                // elbow
-                ed_y += slider_height;
-                Rectangle r_elbow_angle_slider = {ed_x, ed_y, slider_width, slider_height};
-                GuiSlider(r_elbow_angle_slider, TextFormat("r elbow angle: %.2f", cur_pose->r_elbow_angle * RAD2DEG), "", &cur_pose->r_elbow_angle, ELBOW_LOWER_ANGLE, ELBOW_UPPER_ANGLE);
-
-                ed_y += slider_height;
-                Rectangle r_elbow_force_slider = {ed_x, ed_y, slider_width, slider_height};
-                GuiSlider(r_elbow_force_slider, TextFormat("r elbow force: %.2f", cur_pose->r_elbow_force), "", &cur_pose->r_elbow_force, 0.0f, b2RevoluteJoint_GetMaxMotorTorque(psik.r_elbowJointId));
-
-                // hip
-                ed_y += slider_height;
-                Rectangle r_hip_angle_slider = {ed_x, ed_y, slider_width, slider_height};
-                GuiSlider(r_hip_angle_slider, TextFormat("r hip angle: %.2f", cur_pose->r_hip_angle * RAD2DEG), "", &cur_pose->r_hip_angle, HIP_LOWER_ANGLE, HIP_UPPER_ANGLE);
-
-                ed_y += slider_height;
-                Rectangle r_hip_force_slider = {ed_x, ed_y, slider_width, slider_height};
-                GuiSlider(r_hip_force_slider, TextFormat("r hip force: %.2f", cur_pose->r_hip_force), "", &cur_pose->r_hip_force, 0.0f, b2RevoluteJoint_GetMaxMotorTorque(psik.r_hipJointId));
-
-                // knee
-                ed_y += slider_height;
-                Rectangle r_knee_angle_slider = {ed_x, ed_y, slider_width, slider_height};
-                GuiSlider(r_knee_angle_slider, TextFormat("r knee angle: %.2f", cur_pose->r_knee_angle * RAD2DEG), "", &cur_pose->r_knee_angle, KNEE_LOWER_ANGLE, KNEE_UPPER_ANGLE);
-
-                ed_y += slider_height;
-                Rectangle r_knee_force_slider = {ed_x, ed_y, slider_width, slider_height};
-                GuiSlider(r_knee_force_slider, TextFormat("r knee force: %.2f", cur_pose->r_knee_force), "", &cur_pose->r_knee_force, 0.0f, b2RevoluteJoint_GetMaxMotorTorque(psik.r_kneeJointId));
-
-                // ankle
-                ed_y += slider_height;
-                Rectangle r_ankle_angle_slider = {ed_x, ed_y, slider_width, slider_height};
-                GuiSlider(r_ankle_angle_slider, TextFormat("r ankle angle: %.2f", cur_pose->r_ankle_angle * RAD2DEG), "", &cur_pose->r_ankle_angle, ANKLE_LOWER_ANGLE, ANKLE_UPPER_ANGLE);
-
-                ed_y += slider_height;
-                Rectangle r_ankle_force_slider = {ed_x, ed_y, slider_width, slider_height};
-                GuiSlider(r_ankle_force_slider, TextFormat("r ankle force: %.2f", cur_pose->r_ankle_force), "", &cur_pose->r_ankle_force, 0.0f, b2RevoluteJoint_GetMaxMotorTorque(psik.r_ankleJointId));
-            }  // right
-
-            {  // frame dur
-                float slider_width = screen_width * 0.15f;
-                float slider_height = screen_height * 0.04f;
-                state.ed_frame_dur = poser.kfs[poser.kf].frame_dur;
-
-                float ed_x = 0.0f;
-                float ed_y = screen_height - timeline_height - slider_height;
-
-                Rectangle frame_dur_rec = {ed_x, ed_y, slider_width, slider_height};
-                GuiSlider(frame_dur_rec, "", TextFormat("frame duration"), &state.ed_frame_dur, 0.0f, 100.0f);
-                int ed_dur = std::round(state.ed_frame_dur);
-                if (ed_dur != poser.kfs[poser.kf].frame_dur) {
-                    poser.play = false;
-                    poser.kfs[poser.kf].frame_dur = ed_dur;
-                }
-            }  // frame dur
-
-        }  // -- pose editor
-
         if (state.disable_sliders) GuiEnable();
 
         {  // import export
