@@ -55,7 +55,7 @@ std::vector<KF> import_animation(const char* filepath) {
     return kfs;
 }
 
-struct UI_State {
+struct State {
     float ed_frame_dur = 0.0f;
 
     Pose ed_pose_copy = Poses::zero;
@@ -175,7 +175,7 @@ int main() {
     Poser poser = Poser(&psik, kfs1);
     poser.play = false;
 
-    UI_State ui_state;
+    State state;
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
@@ -183,7 +183,7 @@ int main() {
         int screen_height = GetRenderHeight();
         Vector2 mouse_pos = GetMousePosition();
 
-        if (!ui_state.disable_dragdrop_import && IsFileDropped()) {
+        if (!state.disable_dragdrop_import && IsFileDropped()) {
             FilePathList files = LoadDroppedFiles();
             char* filepath = files.paths[0];
             try {
@@ -193,12 +193,12 @@ int main() {
             } catch (Error error) {
                 switch (error) {
                     case ERROR_FILE_NOT_EXIST:
-                        ui_state.error_str = TextFormat("file does not exist: %s", filepath);
-                        TraceLog(LOG_WARNING, ui_state.error_str.c_str());
+                        state.error_str = TextFormat("file does not exist: %s", filepath);
+                        TraceLog(LOG_WARNING, state.error_str.c_str());
                         break;
                     case ERROR_INVALID_FILE:
-                        ui_state.error_str = TextFormat("invalid file: %s", filepath);
-                        TraceLog(LOG_WARNING, ui_state.error_str.c_str());
+                        state.error_str = TextFormat("invalid file: %s", filepath);
+                        TraceLog(LOG_WARNING, state.error_str.c_str());
                         break;
 
                     default:
@@ -209,7 +209,7 @@ int main() {
 
             UnloadDroppedFiles(files);
         }
-        if (!ui_state.disable_keybinds) {
+        if (!state.disable_keybinds) {
             if (IsKeyPressed(KEY_R)) {
                 b2DestroyWorld(worldId);
                 worldId = b2CreateWorld(&worldDef);
@@ -225,13 +225,13 @@ int main() {
 
             if (IsKeyPressed(KEY_C)) {
                 if (poser.kfs.size() > 0) {
-                    ui_state.ed_pose_copy = poser.kfs[poser.kf].pose;
+                    state.ed_pose_copy = poser.kfs[poser.kf].pose;
                 }
             }
 
             if (IsKeyPressed(KEY_V)) {
                 if (poser.kfs.size() > 0) {
-                    poser.kfs[poser.kf].pose = ui_state.ed_pose_copy;
+                    poser.kfs[poser.kf].pose = state.ed_pose_copy;
                 }
             }
 
@@ -301,7 +301,7 @@ int main() {
             msr = MeasureTextEx(GetFontDefault(), frame_dur_str, font_sz, 0.0f);
             DrawText(frame_dur_str, box.x, box.y + box.height - msr.y, font_sz, WHITE);
 
-            if (!ui_state.disable_timeline_interact) {
+            if (!state.disable_timeline_interact) {
                 if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, box)) {
                     poser.play = false;
                     poser.kf = i;
@@ -309,9 +309,9 @@ int main() {
                 }
 
                 if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) && CheckCollisionPointRec(mouse_pos, box)) {
-                    ui_state.ed_kf_name_idx = i;
-                    strcpy(ui_state.ed_kf_name_text, poser.kfs[ui_state.ed_kf_name_idx].name.c_str());
-                    ui_state.enter_name_edit();
+                    state.ed_kf_name_idx = i;
+                    strcpy(state.ed_kf_name_text, poser.kfs[state.ed_kf_name_idx].name.c_str());
+                    state.enter_name_edit();
                 };
             }
 
@@ -345,7 +345,7 @@ int main() {
             DrawRectangleRec(ins_l_btn, DARKBLUE);
             DrawText("<", ins_l_btn.x + ins_l_btn.width / 2 - ins_l_msr.x, ins_l_btn.y + ins_l_btn.height / 2 - ins_l_msr.y / 2, font_sz, WHITE);
 
-            if (!ui_state.disable_timeline_interact) {
+            if (!state.disable_timeline_interact) {
                 if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, add_kf_btn)) {  // insert to right
                     if (poser.kf + 1 >= poser.kfs.size()) {
                         poser.kfs.push_back(KF{.pose = Poses::zero, .frame_dur = 0});
@@ -376,7 +376,7 @@ int main() {
                 DrawRectangleRec(rm_kf_btn, RED);
                 DrawText("del", rm_kf_btn.x + rm_kf_btn.width / 2 - msr.x / 2, rm_kf_btn.y + rm_kf_btn.height / 2 - msr.y / 2, font_sz, WHITE);
 
-                if (!ui_state.disable_timeline_interact && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, rm_kf_btn)) {
+                if (!state.disable_timeline_interact && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, rm_kf_btn)) {
                     poser.kfs.erase(poser.kfs.begin() + poser.kf, poser.kfs.begin() + poser.kf + 1);
                     if (poser.kf > 0) {
                         poser.kf -= 1;
@@ -388,7 +388,7 @@ int main() {
 
         // -- timeline
 
-        if (ui_state.disable_sliders) GuiDisable();
+        if (state.disable_sliders) GuiDisable();
         // pose editor
         if (poser.kfs.size() > 0) {
             Pose* cur_pose = &poser.kfs[poser.kf].pose;
@@ -502,14 +502,14 @@ int main() {
             {  // frame dur
                 float slider_width = screen_width * 0.15f;
                 float slider_height = screen_height * 0.04f;
-                ui_state.ed_frame_dur = poser.kfs[poser.kf].frame_dur;
+                state.ed_frame_dur = poser.kfs[poser.kf].frame_dur;
 
                 float ed_x = 0.0f;
                 float ed_y = screen_height - timeline_height - slider_height;
 
                 Rectangle frame_dur_rec = {ed_x, ed_y, slider_width, slider_height};
-                GuiSlider(frame_dur_rec, "", TextFormat("frame duration"), &ui_state.ed_frame_dur, 0.0f, 100.0f);
-                int ed_dur = std::round(ui_state.ed_frame_dur);
+                GuiSlider(frame_dur_rec, "", TextFormat("frame duration"), &state.ed_frame_dur, 0.0f, 100.0f);
+                int ed_dur = std::round(state.ed_frame_dur);
                 if (ed_dur != poser.kfs[poser.kf].frame_dur) {
                     poser.play = false;
                     poser.kfs[poser.kf].frame_dur = ed_dur;
@@ -518,7 +518,7 @@ int main() {
 
         }  // -- pose editor
 
-        if (ui_state.disable_sliders) GuiEnable();
+        if (state.disable_sliders) GuiEnable();
 
         {  // import export
             float button_height = timeline_height * 0.25f;
@@ -530,7 +530,7 @@ int main() {
             DrawRectangleRec(rec, BLUE);
             DrawText("export", rec.x + rec.width / 2 - msr.x / 2, rec.y + rec.height / 2 - msr.y / 2, font_sz, WHITE);
 
-            if (!ui_state.disable_imp_exp && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, rec)) {
+            if (!state.disable_imp_exp && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, rec)) {
                 export_animation(poser.kfs);
             }
 
@@ -541,7 +541,7 @@ int main() {
             DrawRectangleRec(rec, BLUE);
             DrawText("import", rec.x + rec.width / 2 - msr.x / 2, rec.y + rec.height / 2 - msr.y / 2, font_sz, WHITE);
 
-            if (!ui_state.disable_imp_exp && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, rec)) {
+            if (!state.disable_imp_exp && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, rec)) {
                 char* filepath = "mortal.json";
                 try {
                     std::vector<KF> new_anim = import_animation(filepath);
@@ -550,12 +550,12 @@ int main() {
                 } catch (Error error) {
                     switch (error) {
                         case ERROR_FILE_NOT_EXIST:
-                            ui_state.error_str = TextFormat("file does not exist: %s", filepath);
-                            TraceLog(LOG_WARNING, ui_state.error_str.c_str());
+                            state.error_str = TextFormat("file does not exist: %s", filepath);
+                            TraceLog(LOG_WARNING, state.error_str.c_str());
                             break;
                         case ERROR_INVALID_FILE:
-                            ui_state.error_str = TextFormat("invalid file: %s", filepath);
-                            TraceLog(LOG_WARNING, ui_state.error_str.c_str());
+                            state.error_str = TextFormat("invalid file: %s", filepath);
+                            TraceLog(LOG_WARNING, state.error_str.c_str());
                             break;
 
                         default:
@@ -566,21 +566,21 @@ int main() {
             }
         }  // -- import export
 
-        if (ui_state.editing_name) {  // keyframe name popup
+        if (state.editing_name) {  // keyframe name popup
             float kf_name_rec_w = screen_width * 0.25;
             float kf_name_rec_h = screen_height * 0.18;
             Rectangle kf_name_rec = {screen_width / 2 - kf_name_rec_w / 2, screen_height / 2 - kf_name_rec_h / 2, kf_name_rec_w, kf_name_rec_h};
-            int res = GuiTextInputBox(kf_name_rec, "keyframe name", "", "ok;cancel", ui_state.ed_kf_name_text, KF_NAME_MAX_LEN, nullptr);
+            int res = GuiTextInputBox(kf_name_rec, "keyframe name", "", "ok;cancel", state.ed_kf_name_text, KF_NAME_MAX_LEN, nullptr);
             switch (res) {
                 case 1:  // ok
-                    poser.kfs[ui_state.ed_kf_name_idx].name = ui_state.ed_kf_name_text;
-                    memset(ui_state.ed_kf_name_text, 0, KF_NAME_MAX_LEN);
-                    ui_state.exit_name_edit();
+                    poser.kfs[state.ed_kf_name_idx].name = state.ed_kf_name_text;
+                    memset(state.ed_kf_name_text, 0, KF_NAME_MAX_LEN);
+                    state.exit_name_edit();
                     break;
                 case 0:
                 case 2:  // cancel
-                    memset(ui_state.ed_kf_name_text, 0, KF_NAME_MAX_LEN);
-                    ui_state.exit_name_edit();
+                    memset(state.ed_kf_name_text, 0, KF_NAME_MAX_LEN);
+                    state.exit_name_edit();
                     break;
                 case -1:
                     break;
@@ -590,12 +590,12 @@ int main() {
             }
         }
 
-        if (!ui_state.error_str.empty()) {
+        if (!state.error_str.empty()) {
             float err_rec_w = screen_width * 0.25;
             float err_rec_h = screen_height * 0.18;
             Rectangle err_rec = {screen_width / 2 - err_rec_w / 2, screen_height / 2 - err_rec_h / 2, err_rec_w, err_rec_h};
-            if (GuiMessageBox(err_rec, "Error", ui_state.error_str.c_str(), "ok") > 0) {
-                ui_state.error_str.clear();
+            if (GuiMessageBox(err_rec, "Error", state.error_str.c_str(), "ok") > 0) {
+                state.error_str.clear();
             };
         }
 
