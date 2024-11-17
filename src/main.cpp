@@ -346,9 +346,6 @@ int main() {
                 Vector2 mouse_rel = GetMouseDelta();
                 state.timeline_scroll += mouse_rel.x;
                 state.timeline_scroll = std::max(-leftover, std::min(0.0f, state.timeline_scroll));
-
-                TraceLog(LOG_INFO, "scroll: %.2f", state.timeline_scroll);
-                TraceLog(LOG_INFO, "leftover: %.2f", leftover);
             }
 
             {  // auto
