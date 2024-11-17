@@ -30,6 +30,7 @@ KFs with a duration of 0 will not automatically switch to the next KF, requiring
 
     -   move KF
     -   close/open editor ui
+    -   fix insert left when there is only 1 KF
 
 -   sim:
 
