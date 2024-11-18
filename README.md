@@ -2,7 +2,7 @@
 
 ![](https://github.com/xTarzx/mortal/blob/master/docs/img/mortal.gif)
 
-##
+## info
 
 frame duration: how long a keyframe lasts
 
