@@ -1,5 +1,7 @@
 # mortal
 
+started as backflip madness clone, got sidetracked into animation editor
+
 ![](https://github.com/xTarzx/mortal/blob/master/docs/img/mortal.gif)
 
 ## info
