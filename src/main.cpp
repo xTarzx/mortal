@@ -413,6 +413,21 @@ int main() {
                         }
                         poser.play = false;
                     }
+
+                    {  // clear kfs
+                        const char* text = "clear";
+                        Vector2 msr = MeasureTextEx(GetFontDefault(), text, font_sz, 0.0f);
+                        float button_width = msr.x + screen_width * 0.01f;
+                        Rectangle btn = {rm_kf_btn.x - button_width - screen_width * 0.01f, screen_height - timeline_height, button_width, button_height};
+
+                        DrawRectangleRec(btn, RED);
+                        DrawText(text, btn.x + btn.width / 2 - msr.x / 2, btn.y + btn.height / 2 - msr.y / 2, font_sz, WHITE);
+
+                        if (!state.disable_timeline_interact && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, btn)) {
+                            poser.kfs.clear();
+                            poser.reset();     
+                        }
+                    }
                 }
             }
 
