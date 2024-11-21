@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(mortal VERSION 0.1.1)
+project(mortal VERSION 0.1.2)
 
 
 if(NOT CMAKE_BUILD_TYPE)
