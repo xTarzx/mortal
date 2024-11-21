@@ -27,7 +27,6 @@ KFs with a duration of 0 will not automatically switch to the next KF, requiring
 
 -   import/export:
 
-    -   file dialogs
     -   error handling (cleanup; maybe generalize error handling)
 
 -   editor:

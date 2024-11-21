@@ -24,13 +24,12 @@ enum Error {
     ERROR_INVALID_FILE,
 };
 
-void export_animation(std::vector<KF> kfs) {
+void export_animation(std::vector<KF> kfs, const char* filepath) {
     json j = json::array();
     for (int i = 0; i < kfs.size(); i++) {
         j.push_back(serialize_keyframe(kfs[i]));
     }
 
-    const char* filepath = TextFormat("mortal.json");
     std::string j_str = j.dump(4);
 
     SaveFileText(filepath, const_cast<char*>(j_str.c_str()));
@@ -197,6 +196,7 @@ int main() {
     State state;
 
     GuiWindowFileDialogState fileDialogState = InitGuiWindowFileDialog(GetWorkingDirectory());
+    bool is_export = false;
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
@@ -585,7 +585,11 @@ int main() {
             DrawText("export", rec.x + rec.width / 2 - msr.x / 2, rec.y + rec.height / 2 - msr.y / 2, font_sz, WHITE);
 
             if (!state.disable_imp_exp && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, rec)) {
-                export_animation(poser.kfs);
+                fileDialogState = InitGuiWindowFileDialog(GetWorkingDirectory());
+                fileDialogState.windowActive = true;
+                fileDialogState.saveFileMode = true;
+                is_export = true;
+                state.disable_keybinds = true;
             }
 
             msr = MeasureTextEx(GetFontDefault(), "import", font_sz, 0.0f);
@@ -597,6 +601,8 @@ int main() {
 
             if (!state.disable_imp_exp && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, rec)) {
                 fileDialogState.windowActive = true;
+                is_export = false;
+                state.disable_keybinds = true;
             }
         }  // -- import export
 
@@ -617,6 +623,8 @@ int main() {
                     state.exit_name_edit();
                     break;
                 case -1:
+                    state.disable_keybinds = true;
+
                     break;
                 default:
                     TraceLog(LOG_INFO, "unhandled: %d", res);
@@ -639,29 +647,36 @@ int main() {
         if (fileDialogState.SelectFilePressed) {
             char* filepath = fileDialogState.fileNameText;
 
-            try {
-                std::vector<KF> new_anim = import_animation(filepath);
-                poser.reset();
-                poser.kfs = new_anim;
-            } catch (Error error) {
-                switch (error) {
-                    case ERROR_FILE_NOT_EXIST:
-                        state.error_str = TextFormat("file does not exist: %s", filepath);
-                        TraceLog(LOG_WARNING, state.error_str.c_str());
-                        break;
-                    case ERROR_INVALID_FILE:
-                        state.error_str = TextFormat("invalid file: %s", filepath);
-                        TraceLog(LOG_WARNING, state.error_str.c_str());
-                        break;
+            if (is_export) {
+                export_animation(poser.kfs, filepath);
+            } else {
+                try {
+                    std::vector<KF> new_anim = import_animation(filepath);
+                    poser.reset();
+                    poser.kfs = new_anim;
+                } catch (Error error) {
+                    switch (error) {
+                        case ERROR_FILE_NOT_EXIST:
+                            state.error_str = TextFormat("file does not exist: %s", filepath);
+                            TraceLog(LOG_WARNING, state.error_str.c_str());
+                            break;
+                        case ERROR_INVALID_FILE:
+                            state.error_str = TextFormat("invalid file: %s", filepath);
+                            TraceLog(LOG_WARNING, state.error_str.c_str());
+                            break;
 
-                    default:
-                        TraceLog(LOG_FATAL, "unreachable: %d", error);
-                        break;
-                }
-            };
+                        default:
+                            TraceLog(LOG_FATAL, "unreachable: %d", error);
+                            break;
+                    }
+                };
+            }
 
             fileDialogState.SelectFilePressed = false;
+            state.disable_keybinds = false;
         }
+
+        if (fileDialogState.CancelFilePressed) state.disable_keybinds = false;
 
         EndDrawing();
     }
