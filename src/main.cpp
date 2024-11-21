@@ -1,9 +1,9 @@
 #include <iostream>
 #include <cassert>
-#include <raylib.h>
-#include <rlgl.h>
-#include <raymath.h>
-#include <box2d/box2d.h>
+#include "raylib.h"
+#include "rlgl.h"
+#include "raymath.h"
+#include "box2d/box2d.h"
 
 #include "common.h"
 #include "psik.h"
@@ -11,7 +11,11 @@
 #include "poses.h"
 
 #define RAYGUI_IMPLEMENTATION
-#include <raygui.h>
+#include "raygui.h"
+
+#undef RAYGUI_IMPLEMENTATION
+#define GUI_WINDOW_FILE_DIALOG_IMPLEMENTATION
+#include "gui_window_file_dialog.h"
 
 #include "serialize.h"
 
@@ -192,6 +196,8 @@ int main() {
 
     State state;
 
+    GuiWindowFileDialogState fileDialogState = InitGuiWindowFileDialog(GetWorkingDirectory());
+
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
         int screen_width = GetRenderWidth();
@@ -285,6 +291,9 @@ int main() {
         psik.draw();
 
         EndMode2D();
+
+        if (fileDialogState.windowActive) GuiLock();
+
         // timeline
         float timeline_height = screen_height * 0.20f;
         if (state.timeline_drag && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) state.exit_timeline_drag();
@@ -425,7 +434,7 @@ int main() {
 
                         if (!state.disable_timeline_interact && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, btn)) {
                             poser.kfs.clear();
-                            poser.reset();     
+                            poser.reset();
                         }
                     }
                 }
@@ -587,27 +596,7 @@ int main() {
             DrawText("import", rec.x + rec.width / 2 - msr.x / 2, rec.y + rec.height / 2 - msr.y / 2, font_sz, WHITE);
 
             if (!state.disable_imp_exp && IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_pos, rec)) {
-                char* filepath = "mortal.json";
-                try {
-                    std::vector<KF> new_anim = import_animation(filepath);
-                    poser.reset();
-                    poser.kfs = new_anim;
-                } catch (Error error) {
-                    switch (error) {
-                        case ERROR_FILE_NOT_EXIST:
-                            state.error_str = TextFormat("file does not exist: %s", filepath);
-                            TraceLog(LOG_WARNING, state.error_str.c_str());
-                            break;
-                        case ERROR_INVALID_FILE:
-                            state.error_str = TextFormat("invalid file: %s", filepath);
-                            TraceLog(LOG_WARNING, state.error_str.c_str());
-                            break;
-
-                        default:
-                            TraceLog(LOG_FATAL, "unreachable: %d", error);
-                            break;
-                    }
-                };
+                fileDialogState.windowActive = true;
             }
         }  // -- import export
 
@@ -642,6 +631,36 @@ int main() {
             if (GuiMessageBox(err_rec, "Error", state.error_str.c_str(), "ok") > 0) {
                 state.error_str.clear();
             };
+        }
+
+        GuiUnlock();
+        GuiWindowFileDialog(&fileDialogState);
+
+        if (fileDialogState.SelectFilePressed) {
+            char* filepath = fileDialogState.fileNameText;
+
+            try {
+                std::vector<KF> new_anim = import_animation(filepath);
+                poser.reset();
+                poser.kfs = new_anim;
+            } catch (Error error) {
+                switch (error) {
+                    case ERROR_FILE_NOT_EXIST:
+                        state.error_str = TextFormat("file does not exist: %s", filepath);
+                        TraceLog(LOG_WARNING, state.error_str.c_str());
+                        break;
+                    case ERROR_INVALID_FILE:
+                        state.error_str = TextFormat("invalid file: %s", filepath);
+                        TraceLog(LOG_WARNING, state.error_str.c_str());
+                        break;
+
+                    default:
+                        TraceLog(LOG_FATAL, "unreachable: %d", error);
+                        break;
+                }
+            };
+
+            fileDialogState.SelectFilePressed = false;
         }
 
         EndDrawing();

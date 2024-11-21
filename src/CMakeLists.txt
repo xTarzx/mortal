@@ -14,6 +14,7 @@ target_include_directories(${PROJECT_NAME}
         ${PROJECT_SOURCE_DIR}/include
         ${EXTERNAL_DIR}/raylib/src
         ${EXTERNAL_DIR}/raygui/src
+        ${EXTERNAL_DIR}/raygui/examples/custom_file_dialog
         ${EXTERNAL_DIR}/box2d/include
         ${EXTERNAL_DIR}/json/include
 )
