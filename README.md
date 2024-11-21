@@ -22,6 +22,8 @@ KFs with a duration of 0 will not automatically switch to the next KF, requiring
 -   `SHIFT + SPACE` - previous keyframe
 -   `C` - copy current pose
 -   `V` - paste copied pose to current keyframe
+-   `K` - move keyframe left
+-   `L` - move keyframe right
 
 # TODO:
 
