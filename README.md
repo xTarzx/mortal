@@ -25,12 +25,8 @@ KFs with a duration of 0 will not automatically switch to the next KF, requiring
 
 # TODO:
 
--   import/export:
-
-    -   error handling (cleanup; maybe generalize error handling)
-
 -   editor:
-
+    -   toggle motor
     -   move KF (can be done by copying and pasting)
 
 -   sim:
