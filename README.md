@@ -26,8 +26,8 @@ KFs with a duration of 0 will not automatically switch to the next KF, requiring
 # TODO:
 
 -   editor:
+
     -   toggle motor
-    -   move KF (can be done by copying and pasting)
 
 -   sim:
     -   give bro a spine

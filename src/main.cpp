@@ -3,6 +3,7 @@
 #include "raylib.h"
 #include "rlgl.h"
 #include "raymath.h"
+#include <algorithm>
 #include "box2d/box2d.h"
 
 #include "common.h"
@@ -266,6 +267,20 @@ int main() {
 
             if (IsKeyPressed(KEY_H)) {
                 state.disable_editor = !state.disable_editor;
+            }
+
+            if (IsKeyPressed(KEY_K) && poser.kfs.size() > 1) {
+                if (poser.kf > 0) {
+                    std::swap(poser.kfs[poser.kf], poser.kfs[poser.kf - 1]);
+                    poser.prev_kf();
+                }
+            }
+
+            if (IsKeyPressed(KEY_L) && poser.kfs.size() > 1) {
+                if (poser.kf + 1 < poser.kfs.size()) {
+                    std::swap(poser.kfs[poser.kf], poser.kfs[poser.kf + 1]);
+                    poser.next_kf();
+                }
             }
 
             Vector2 cam_mov = {(float)IsKeyDown(KEY_D) - (float)IsKeyDown(KEY_A), (float)IsKeyDown(KEY_S) - (float)IsKeyDown(KEY_W)};
