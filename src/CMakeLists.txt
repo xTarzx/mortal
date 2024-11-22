@@ -5,6 +5,7 @@ set(SOURCES
     serialize.cpp
     ground.cpp
     editor.cpp
+    mmenu.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
