@@ -1,9 +1,11 @@
 #include "pose.h"
 #include <cassert>
 
-Poser::Poser(Psik* target, std::vector<KF> kfs) {
-    this->target = target;
+Poser::Poser(Psik* target, std::vector<KF> kfs) : Poser() {
     this->kfs = kfs;
+};
+Poser::Poser(Psik* target) {
+    this->target = target;
 
     frame = 0;
     kf = 0;

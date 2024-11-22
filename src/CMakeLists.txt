@@ -3,6 +3,8 @@ set(SOURCES
     pose.cpp
     psik.cpp
     serialize.cpp
+    ground.cpp
+    editor.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

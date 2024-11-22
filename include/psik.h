@@ -40,6 +40,7 @@ class Psik {
     b2JointId l_elbowJointId;
 
     Psik(b2WorldId b2WorldId);
+    Psik() = default;
     void draw();
 
     void set_joint_angle(b2JointId jointId, float angle, float speed);

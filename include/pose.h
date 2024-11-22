@@ -54,6 +54,8 @@ class Poser {
     bool play;
 
     Poser(Psik *target, std::vector<KF> kfs);
+    Poser(Psik *target);
+    Poser() = default;
     void update();
 
     void apply_pose(Pose pose);
