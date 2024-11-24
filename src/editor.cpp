@@ -370,7 +370,7 @@ void Editor::draw() {
 
             {  // left
 
-                float slider_width = screen_width * 0.12f;
+                float slider_width = screen_width * 0.16f;
                 float slider_height = screen_height * 0.04f;
 
                 float ed_x = 0.0f;
