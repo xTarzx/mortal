@@ -20,7 +20,6 @@ void Menu::draw() {
     Vector2 mouse_pos = GetMousePosition();
 
     ClearBackground(GetColor(0x1f1f1fff));
-    TraceLog(LOG_INFO, "%d", screen_height);
 
     const char* title = "MORTAL";
     float title_fsz = screen_height * 0.119f;
