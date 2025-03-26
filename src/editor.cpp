@@ -368,9 +368,10 @@ void Editor::draw() {
         if (poser.kfs.size() > 0) {
             Pose* cur_pose = &poser.kfs[poser.kf].pose;
 
+            const float slider_width_factor = 0.16f;
             {  // left
 
-                float slider_width = screen_width * 0.16f;
+                float slider_width = screen_width * slider_width_factor;
                 float slider_height = screen_height * 0.04f;
 
                 float ed_x = 0.0f;
@@ -423,7 +424,7 @@ void Editor::draw() {
 
             {  // right
 
-                float slider_width = screen_width * 0.12f;
+                float slider_width = screen_width * slider_width_factor;
                 float slider_height = screen_height * 0.04f;
 
                 float ed_x = screen_width - slider_width;
