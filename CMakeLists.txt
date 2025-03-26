@@ -6,6 +6,8 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
+set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 add_subdirectory(external/raylib)
 add_subdirectory(external/box2d)
 add_subdirectory(src)
